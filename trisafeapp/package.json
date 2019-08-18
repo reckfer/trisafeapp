@@ -5,8 +5,8 @@
   "scripts": {
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint .",
-    "react-devtool": "react-devtools"
+    "lint": "eslint ."
+    
   },
   "dependencies": {
     "react": "16.8.6",
