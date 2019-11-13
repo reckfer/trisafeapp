@@ -24,9 +24,12 @@ export default class Cliente extends Component {
 
     constructor(props) {
         super(props);
-        this.state = { 'codigo': '', 'nome': '', 'cpf': '', 'rg': '', 'email': '' };
+        this.state = { 'codigo': '', 'nomeCliente': '', 'cpf': '', 'rg': '', 'email': '', 'nomeUsuario': '' };
+        this.limpar = this.limpar.bind(this);
+        this.salvar = this.salvar.bind(this);
         this.obterCliente = this.obterCliente.bind(this);
         this.atribuirDadosCliente = this.atribuirDadosCliente.bind(this);
+        this.capturarDadosCadastro = this.capturarDadosCadastro.bind(this);
         this.capturarDadosFiltroCallBack = this.capturarDadosFiltroCallBack.bind(this);
     }
 
@@ -37,7 +40,7 @@ export default class Cliente extends Component {
 
             if (__DEV__) {
                 protocol = 'http://';
-                domain = '192.168.0.5:8000';
+                domain = '192.168.0.4:8000';
             }
             let estado = this.state;
             let url = protocol + domain + '/clientes/obter?idCliente=' + estado.codigo;
@@ -69,10 +72,68 @@ export default class Cliente extends Component {
         }
     }
 
+    salvar() {
+        try {
+            let protocol = 'https://';
+            let domain = 'trisafeserverappd.herokuapp.com';
+
+            if (__DEV__) {
+                protocol = 'http://';
+                domain = '192.168.0.4:8000';
+            }
+            let estado = this.state;
+            Alert.alert(estado.nomeUsuario);
+            Alert.alert(estado.nomeCliente);
+            Alert.alert(estado.email);
+            let url = protocol + domain + '/clientes/incluir?nomeCliente=' + estado.nomeCliente + '&email=' + estado.email + '&nomeUsuario=' + estado.nomeUsuario;
+
+            fetch(url, { method: 'GET' })
+                .then(tratarRespostaHTTP)
+                .then((oJsonDados) => {
+                    this.atribuirDadosCliente(oJsonDados);
+                })
+                .catch(function (erro) {
+                    Alert.alert(erro.message);
+                    throw erro;
+                });
+        } catch (exc) {
+            Alert.alert(exc);
+        }
+    }
+
+    limpar() {
+        let estado = this.state;
+
+        estado.nome = '';
+        estado.cpf = '';
+        estado.rg = '';
+        estado.email = '';
+        this.setState(estado);
+    }
+
     capturarDadosFiltroCallBack(oDadosFiltro) {
         let estado = this.state;
         
         estado.codigo = oDadosFiltro.codigo;
+        this.setState(estado);
+    }
+        
+    capturarDadosCadastro(oDadosFiltro) {
+        let estado = this.state;
+
+        // estado.codigo = oDadosFiltro.codigo;
+        // estado.cpf = oDadosFiltro.cpf;
+        // estado.rg = oDadosFiltro.rg;
+        if(oDadosFiltro.nomeCliente){
+            estado.nomeCliente = oDadosFiltro.nomeCliente;
+        }
+        if(oDadosFiltro.email) {
+            estado.email = oDadosFiltro.email;
+        }
+        if(oDadosFiltro.nomeUsuario) {
+            estado.nomeUsuario = oDadosFiltro.nomeUsuario;
+        }
+
         this.setState(estado);
     }
 
@@ -81,8 +142,8 @@ export default class Cliente extends Component {
         return (
             <View style={styles.areaCliente}>
                 <Cabecalho />
-                <AreaDados parentCallBack={this.capturarDadosFiltroCallBack} dadosCliente={dadosCliente}/>
-                <AreaBotoes obterCliente={this.obterCliente}/>
+                <AreaDados parentCallBack={this.capturarDadosFiltroCallBack} capturarDadosCallBack={this.capturarDadosCadastro} dadosCliente={dadosCliente}/>
+                <AreaBotoes salvar={this.salvar} obterCliente={this.obterCliente} limpar={this.limpar}/>
             </View>
         );
     }
@@ -121,10 +182,12 @@ export class AreaDados extends Component {
         return (
             <View style={styles.areaDadosCliente}>
                 <TextInput placeholder="Código" style={styles.textInput} onChangeText={(valor) => this.props.parentCallBack({ codigo: valor })}></TextInput>
-                <TextInput placeholder="Nome Completo" style={styles.textInput} value={this.props.dadosCliente.nome}></TextInput>
+                <TextInput placeholder="Nome Completo" style={styles.textInput} value={this.props.dadosCliente.nomeCliente} onChangeText={(valor) => this.props.capturarDadosCallBack({ nomeCliente: valor })}></TextInput>
+                <TextInput placeholder="Nome Usuário" style={styles.textInput} value={this.props.dadosCliente.nomeUsuario} onChangeText={(valor) => this.props.capturarDadosCallBack({ nomeUsuario: valor })}></TextInput>
+                <TextInput placeholder="E-mail" style={styles.textInput} value={this.props.dadosCliente.email} onChangeText={(valor) => this.props.capturarDadosCallBack({ email: valor })}></TextInput>
                 <TextInput placeholder="CPF/ CNPJ" style={styles.textInput} value={this.props.dadosCliente.cpf}></TextInput>
                 <TextInput placeholder="RG" style={styles.textInput} value={this.props.dadosCliente.rg}></TextInput>
-                <TextInput placeholder="E-mail" style={styles.textInput} value={this.props.dadosCliente.email}></TextInput>
+                
             </View>
         );
     }
@@ -138,7 +201,9 @@ export class AreaBotoes extends Component {
     render() {
         return (
             <View>
-                <Button title="Pronto" onPress={this.props.obterCliente} color="#4682b4" ></Button>
+                <Button title="Obter" onPress={this.props.obterCliente} color="#4682b4" ></Button>
+                <Button title="Salvar" onPress={this.props.salvar} color="#4682b4" ></Button>
+                <Button title="Limpar" onPress={this.props.limpar} color="#4682b4" ></Button>
             </View>
         );
     }
