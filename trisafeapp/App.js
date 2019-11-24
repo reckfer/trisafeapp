@@ -6,7 +6,7 @@
  */
 
 import React, {Component} from 'react';
-import Cliente from './Cliente';
+import Cliente from './src/Cliente';
 // import {
 //   SafeAreaView,
 //   StyleSheet,
