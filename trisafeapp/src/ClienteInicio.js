@@ -7,46 +7,59 @@
 
 import React, { Component } from 'react';
 import {
-    SafeAreaView,
     StyleSheet,
-    ScrollView,
     Alert,
     View,
     Image,
     Text,
-    Console,
-    StatusBar,
     TextInput,
     Button
 } from 'react-native';
+import Util from './Util';
 
 export default class ClienteInicio extends Component {
-
+    static navigationOptions = {
+        title: 'ClienteInicio'
+    }
     constructor(props) {
         super(props);
-        this.state = { 'codigo': '', 'nomeCliente': '', 'cpf': '', 'rg': '', 'email': '', 'nomeUsuario': '' };
+        this.state = { 'cpf': '', 'email': '', 'nomeUsuario': '' };
         this.limpar = this.limpar.bind(this);
-        this.salvar = this.salvar.bind(this);
+        this.capturarDadosCadastro = this.capturarDadosCadastro.bind(this);
         this.obterCliente = this.obterCliente.bind(this);
         this.atribuirDadosCliente = this.atribuirDadosCliente.bind(this);
-        this.capturarDadosCadastro = this.capturarDadosCadastro.bind(this);
-        this.capturarDadosFiltroCallBack = this.capturarDadosFiltroCallBack.bind(this);
+        objUtil = new Util();
+    }
+
+    capturarDadosCadastro(oDadosCadastro) {
+        let estado = this.state;
+    
+        estado.cpf = oDadosCadastro.cpf;
+        estado.nomeUsuario = oDadosCadastro.nomeUsuario;
+        estado.email = oDadosCadastro.email;
+        
+        this.setState(estado);
     }
 
     obterCliente() {
         try {
-            let protocol = 'https://';
-            let domain = 'trisafeserverappd.herokuapp.com';
-
-            if (__DEV__) {
-                protocol = 'http://';
-                domain = '10.0.0.106:8000';
-            }
             let estado = this.state;
-            let url = protocol + domain + '/clientes/obter?idCliente=' + estado.codigo;
-
-            fetch(url, { method: 'GET' })
-                .then(tratarRespostaHTTP)
+            let url = objUtil.getURL('/clientes/obter/');
+            
+            //fetch(url, { method: 'GET' })
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                  Accept: 'application/json',
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  cpf: estado.cpf,
+                  nomeUsuario: estado.nomeUsuario,
+                  email: estado.email
+                }),
+              })
+                .then(obterJsonResposta)
                 .then((oJsonDados) => {
                     this.atribuirDadosCliente(oJsonDados);
                 })
@@ -60,102 +73,46 @@ export default class ClienteInicio extends Component {
     }
 
     atribuirDadosCliente(oJsonDados) {
+        const { navigation } = this.props;
+        //this.limpar();
         if(oJsonDados && oJsonDados.user) {
-            let estado = this.state;
-
-            estado.nome = oJsonDados.user.name;
-            estado.cpf = oJsonDados.user.document;
-            estado.email = oJsonDados.user.email;
-            this.setState(estado);
-        } else {
-            Alert.alert('Cadastrado não localizado.');
-        }
-    }
-
-    salvar() {
-        try {
-            let protocol = 'https://';
-            let domain = 'trisafeserverappd.herokuapp.com';
-
-            if (__DEV__) {
-                protocol = 'http://';
-                domain = '10.0.0.106:8000';
-            }
-            let estado = this.state;
             
-            //let url = protocol + domain + '/clientes/incluir?nomeCliente=' + estado.nomeCliente + '&email=' + estado.email + '&nomeUsuario=' + estado.nomeUsuario;
-            let url = protocol + domain + '/clientes/incluir';
+            // let estado = this.state;
 
-            // fetch(url, { method: 'GET' })
-            //     .then(tratarRespostaHTTP)
-            //     .then((oJsonDados) => {
-            //         this.atribuirDadosCliente(oJsonDados);
-            //     })
-            //     .catch(function (erro) {
-            //         Alert.alert(erro.message);
-            //         throw erro;
-            //     });
-                
-            fetch(url, {
-                    method: 'POST',
-                    headers: {
-                      Accept: 'application/json',
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                      nomeCliente: estado.nomeCliente,                      
-                      nomeUsuario: estado.nomeUsuario,
-                      email: estado.email
-                    }),
-                  });
-        } catch (exc) {
-            Alert.alert(exc);
+            // estado.codigo = oJsonDados.user.id.toString();
+            // estado.nomeCliente = oJsonDados.user.name;            
+            // estado.nomeUsuario = oJsonDados.user.userName;
+            // estado.cpf = oJsonDados.user.document;
+            // estado.email = oJsonDados.user.email;
+            
+            //this.setState(estado);
+            
+            navigation.navigate('Cliente', oJsonDados.user);
+
+        } else if (oJsonDados.mensagem && oJsonDados.mensagem.trim()){
+            Alert.alert(oJsonDados.mensagem);
+        } else {
+            navigation.navigate('Cliente', this.state);
+            //Alert.alert('Cadastrado não localizado.');
         }
     }
 
     limpar() {
         let estado = this.state;
 
-        estado.nome = '';
+        estado.nomeUsuario = '';
         estado.cpf = '';
-        estado.rg = '';
         estado.email = '';
         this.setState(estado);
     }
-
-    capturarDadosFiltroCallBack(oDadosFiltro) {
-        let estado = this.state;
-        
-        estado.codigo = oDadosFiltro.codigo;
-        this.setState(estado);
-    }
-        
-    capturarDadosCadastro(oDadosFiltro) {
-        let estado = this.state;
-
-        // estado.codigo = oDadosFiltro.codigo;
-        // estado.cpf = oDadosFiltro.cpf;
-        // estado.rg = oDadosFiltro.rg;
-        if(oDadosFiltro.nomeCliente){
-            estado.nomeCliente = oDadosFiltro.nomeCliente;
-        }
-        if(oDadosFiltro.email) {
-            estado.email = oDadosFiltro.email;
-        }
-        if(oDadosFiltro.nomeUsuario) {
-            estado.nomeUsuario = oDadosFiltro.nomeUsuario;
-        }
-
-        this.setState(estado);
-    }
-
+    
     render() {
         let dadosCliente = this.state;
         return (
             <View style={styles.areaCliente}>
                 <Cabecalho />
                 <AreaDados parentCallBack={this.capturarDadosFiltroCallBack} capturarDadosCallBack={this.capturarDadosCadastro} dadosCliente={dadosCliente}/>
-                <AreaBotoes salvar={this.salvar} obterCliente={this.obterCliente} limpar={this.limpar}/>
+                <AreaBotoes limpar={this.limpar} navigation = {this.props.navigation} obterCliente={this.obterCliente} dadosCliente={dadosCliente}/>
             </View>
         );
     }
@@ -192,10 +149,10 @@ export class AreaDados extends Component {
     render() {
 
         return (
-            <View style={styles.areaDadosCliente}>
-                <TextInput placeholder="Nome Usuário" style={styles.textInput} value={this.props.dadosCliente.nomeUsuario} onChangeText={(valor) => this.props.capturarDadosCallBack({ nomeUsuario: valor })}></TextInput>
-                <TextInput placeholder="E-mail" style={styles.textInput} value={this.props.dadosCliente.email} onChangeText={(valor) => this.props.capturarDadosCallBack({ email: valor })}></TextInput>
-                <TextInput placeholder="CPF/ CNPJ" style={styles.textInput} value={this.props.dadosCliente.cpf}></TextInput>                
+            <View style={styles.areaDadosCliente}>                
+                <TextInput placeholder="E-mail" style={styles.textInput} onChangeText={(valor) => { this.props.dadosCliente.email = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>
+                <TextInput placeholder="CPF/ CNPJ" style={styles.textInput} onChangeText={(valor) => { this.props.dadosCliente.cpf = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>                
+                <TextInput placeholder="Nome Usuário" style={styles.textInput} onChangeText={(valor) => { this.props.dadosCliente.nomeUsuario = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>
             </View>
         );
     }
@@ -203,25 +160,35 @@ export class AreaDados extends Component {
 
 export class AreaBotoes extends Component {
     
+    static navigationOptions = {
+        title: 'ClienteInicio'
+    }
+
     constructor(props) {
         super(props);
     }
+
     render() {
+        // const { navigation } = this.props;
         return (
             <View>
-                <Button title="Obter" onPress={this.props.obterCliente} color="#4682b4" ></Button>
-                <Button title="Salvar" onPress={this.props.salvar} color="#4682b4" ></Button>
-                <Button title="Limpar" onPress={this.props.limpar} color="#4682b4" ></Button>
+                <Button title="Iniciar" onPress={this.props.obterCliente} ></Button>
+                {/* <Button title="Iniciar" onPress={() => {navigation.navigate('Cliente', {
+                    nomeUsuario: this.props.dadosCliente.nomeUsuario,
+                    cpf: this.props.dadosCliente.cpf,
+                    email: this.props.dadosCliente.email
+                })}} ></Button> */}
             </View>
         );
     }
 }
-function tratarRespostaHTTP(oRespostaHTTP) {
-    if (oRespostaHTTP.ok) {
-        return oRespostaHTTP.json();
-    } else {
-        Alert.alert("Erro: " + oRespostaHTTP.status);
+
+function obterJsonResposta(oRespostaHTTP) {
+    
+    if(oRespostaHTTP) {
+        return oRespostaHTTP.json();        
     }
+    return null;
 }
 
 const styles = StyleSheet.create({

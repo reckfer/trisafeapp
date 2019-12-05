@@ -1,43 +1,43 @@
 /**
- * Arquivo principal do aplicativo da Trisafe.
+ * Sample React Native App
+ * https://github.com/facebook/react-native
  *
  * @format
  * @flow
  */
 
 import React, {Component} from 'react';
+import { createStackNavigator } from 'react-navigation-stack';
+import { createAppContainer } from 'react-navigation';
+import { createDrawerNavigator } from 'react-navigation-drawer';
 import Cliente from './src/Cliente';
-// import {
-//   SafeAreaView,
-//   StyleSheet,
-//   ScrollView,
-//   Alert,
-//   View,
-//   Text,
-//   Console,
-//   StatusBar,
-//   TextInput,
-//   Button,
-//   Fragment
-// } from 'react-native';
+import ClienteInicio from './src/ClienteInicio';
 
-// import {
-//   Header,
-//   LearnMoreLinks,
-//   Colors,
-//   DebugInstructions,
-//   ReloadInstructions,  
-// } from 'react-native/Libraries/NewAppScreen';
+const AppNavigator = createDrawerNavigator({
+  ClienteInicio: {
+    screen: ClienteInicio
+  },
+  Cliente: {
+    screen: Cliente
+  }
+},
+{});
 
+export default createAppContainer(AppNavigator);
 
+// /**
+//  * Arquivo principal do aplicativo da Trisafe.
+//  *
+//  * @format
+//  * @flow
+//  */
 
-// if (__DEV__) {
-//   require('react-devtools');
+// import React, {Component} from 'react';
+// import Cliente from './src/Cliente';
+
+// export default class App extends Component {
+
+//   render() {
+//     return (<Cliente />);    
+//   };
 // }
-
-export default class App extends Component {
-
-  render() {
-    return (<Cliente />);    
-  };
-}

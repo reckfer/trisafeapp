@@ -22,65 +22,61 @@ import {
 import Util from './Util';
 
 export default class Cliente extends Component {
-
+    static navigationOptions = {
+        title: 'Cliente'
+    }
     constructor(props) {
         super(props);
         this.state = { 'codigo': '', 'nomeCliente': '', 'cpf': '', 'rg': '', 'email': '', 'nomeUsuario': '' };
         this.limpar = this.limpar.bind(this);
         this.salvar = this.salvar.bind(this);
-        this.obterCliente = this.obterCliente.bind(this);
+        // this.obterCliente = this.obterCliente.bind(this);
         this.atribuirDadosCliente = this.atribuirDadosCliente.bind(this);
         this.capturarDadosCadastro = this.capturarDadosCadastro.bind(this);
         this.capturarDadosFiltroCallBack = this.capturarDadosFiltroCallBack.bind(this);
         objUtil = new Util();
     }
 
-    obterCliente() {
-        try {
-            // let protocol = 'https://';
-            // let domain = 'trisafeserverappd.herokuapp.com';
-
-            // if (__DEV__) {
-            //     protocol = 'http://';
-            //     domain = '10.0.0.106:8000';
-            //     //domain = '192.168.0.6:8000';
-            //     //domain = '192.168.0.4:8000';
-            // }
+    // obterCliente() {
+    //     try {            
+    //         let estado = this.state;
+    //         let url = objUtil.getURL('/clientes/obter?idCliente=' + estado.codigo);
             
-            // let url = protocol + domain + '/clientes/obter?idCliente=' + estado.codigo;
-            let estado = this.state;
-            let url = objUtil.getURL('/clientes/obter?idCliente=' + estado.codigo);
-            Alert.alert(url);
-            fetch(url, { method: 'GET' })
-                .then(obterJsonResposta)
-                .then((oJsonDados) => {
-                    this.atribuirDadosCliente(oJsonDados);
-                })
-                .catch(function (erro) {
-                    Alert.alert(erro.message);
-                    throw erro;
-                });
-        } catch (exc) {
-            Alert.alert(exc);
-        }
-    }
+    //         fetch(url, { method: 'GET' })
+    //             .then(obterJsonResposta)
+    //             .then((oJsonDados) => {
+    //                 this.atribuirDadosCliente(oJsonDados);
+    //             })
+    //             .catch(function (erro) {
+    //                 Alert.alert(erro.message);
+    //                 throw erro;
+    //             });
+    //     } catch (exc) {
+    //         Alert.alert(exc);
+    //     }
+    // }
 
     tratarRetornoJson(oJsonResposta) {
     
+        Alert.alert(oJsonResposta.mensagem);
         if(oJsonResposta && !oJsonResposta.ok) {
-            Alert.alert(oJsonResposta.mensagem);
+            
             return null;
         }
         return oJsonResposta;
     }
 
     atribuirDadosCliente(oJsonDados) {
+        this.limpar();
         if(oJsonDados && oJsonDados.user) {
             let estado = this.state;
 
-            estado.nome = oJsonDados.user.name;
+            estado.codigo = oJsonDados.user.id.toString();
+            estado.nomeCliente = oJsonDados.user.name;            
+            estado.nomeUsuario = oJsonDados.user.userName;
             estado.cpf = oJsonDados.user.document;
             estado.email = oJsonDados.user.email;
+            
             this.setState(estado);
         } else if (oJsonDados.mensagem && oJsonDados.mensagem.trim()){
             Alert.alert(oJsonDados.mensagem);
@@ -91,17 +87,7 @@ export default class Cliente extends Component {
 
     salvar() {
         try {
-            // let protocol = 'https://';
-            // let domain = 'trisafeserverappd.herokuapp.com';
-
-            // if (__DEV__) {
-            //     protocol = 'http://';
-            //     domain = '10.0.0.106:8000';
-            //     // domain = '192.168.0.6:8000';
-            //     //domain = '192.168.0.4:8000';
-            // }
             let estado = this.state;            
-            // let url = protocol + domain + '/clientes/incluir/';
             let url = objUtil.getURL('/clientes/incluir/');
 
             fetch(url, {
@@ -119,7 +105,7 @@ export default class Cliente extends Component {
                     }),
                   })
                   .then(obterJsonResposta)
-                  .then((oJsonDados) => {this.tratarRetornoJson(oJsonDados)})
+                  .then((oJsonDados) => {this.atribuirDadosCliente(oJsonDados)})
         } catch (exc) {
             Alert.alert(exc);
         }
@@ -128,7 +114,9 @@ export default class Cliente extends Component {
     limpar() {
         let estado = this.state;
 
-        estado.nome = '';
+        estado.codigo = '';
+        estado.nomeCliente = '';
+        estado.nomeUsuario = '';
         estado.cpf = '';
         estado.rg = '';
         estado.email = '';
@@ -155,6 +143,12 @@ export default class Cliente extends Component {
 
     render() {
         let dadosCliente = this.state;
+        const { navigation } = this.props;        
+        // Obtem os dados vindos da primeira tela.
+        dadosCliente.email = navigation.getParam('email', 'NO-ID');
+        dadosCliente.cpf = navigation.getParam('cpf', 'NO-ID');
+        dadosCliente.nomeUsuario = navigation.getParam('nomeUsuario', 'NO-ID');
+        
         return (
             <View style={styles.areaCliente}>
                 <Cabecalho />
@@ -197,7 +191,7 @@ export class AreaDados extends Component {
 
         return (
             <View style={styles.areaDadosCliente}>
-                <TextInput placeholder="Código" style={styles.textInput} onChangeText={(valor) => this.props.parentCallBack({ codigo: valor })}></TextInput>
+                <TextInput placeholder="Código" style={styles.textInput} value={this.props.dadosCliente.codigo} onChangeText={(valor) => this.props.parentCallBack({ codigo: valor })}></TextInput>
                 <TextInput placeholder="Nome Completo" style={styles.textInput} value={this.props.dadosCliente.nomeCliente} onChangeText={(valor) => { this.props.dadosCliente.nomeCliente = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>
                 <TextInput placeholder="Nome Usuário" style={styles.textInput} value={this.props.dadosCliente.nomeUsuario} onChangeText={(valor) => { this.props.dadosCliente.nomeUsuario = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>
                 <TextInput placeholder="E-mail" style={styles.textInput} value={this.props.dadosCliente.email} onChangeText={(valor) => { this.props.dadosCliente.email = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>
