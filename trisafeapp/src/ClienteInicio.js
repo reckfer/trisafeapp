@@ -8,6 +8,8 @@
 import React, { Component } from 'react';
 import {
     StyleSheet,
+    ScrollView,
+    SafeAreaView,
     Alert,
     View,
     Image,
@@ -23,7 +25,10 @@ export default class ClienteInicio extends Component {
     }
     constructor(props) {
         super(props);
-        this.state = { 'cpf': '', 'email': '', 'nomeUsuario': '' };
+        this.state = { 
+            'cpf': '', 
+            'email': '' 
+        };
         this.limpar = this.limpar.bind(this);
         this.capturarDadosCadastro = this.capturarDadosCadastro.bind(this);
         this.obterCliente = this.obterCliente.bind(this);
@@ -35,7 +40,6 @@ export default class ClienteInicio extends Component {
         let estado = this.state;
     
         estado.cpf = oDadosCadastro.cpf;
-        estado.nomeUsuario = oDadosCadastro.nomeUsuario;
         estado.email = oDadosCadastro.email;
         
         this.setState(estado);
@@ -46,7 +50,6 @@ export default class ClienteInicio extends Component {
             let estado = this.state;
             let url = objUtil.getURL('/clientes/obter/');
             
-            //fetch(url, { method: 'GET' })
             fetch(url, {
                 method: 'POST',
                 headers: {
@@ -55,7 +58,6 @@ export default class ClienteInicio extends Component {
                 },
                 body: JSON.stringify({
                   cpf: estado.cpf,
-                  nomeUsuario: estado.nomeUsuario,
                   email: estado.email
                 }),
               })
@@ -74,33 +76,26 @@ export default class ClienteInicio extends Component {
 
     atribuirDadosCliente(oJsonDados) {
         const { navigation } = this.props;
-        //this.limpar();
-        if(oJsonDados && oJsonDados.user) {
+        let oDadosCliente;
+        
+        if(oJsonDados && oJsonDados.dados && oJsonDados.dados.trim()) {
             
-            // let estado = this.state;
+            oDadosCliente = oJsonDados.dados;
 
-            // estado.codigo = oJsonDados.user.id.toString();
-            // estado.nomeCliente = oJsonDados.user.name;            
-            // estado.nomeUsuario = oJsonDados.user.userName;
-            // estado.cpf = oJsonDados.user.document;
-            // estado.email = oJsonDados.user.email;
-            
-            //this.setState(estado);
-            
-            navigation.navigate('Cliente', oJsonDados.user);
-
-        } else if (oJsonDados.mensagem && oJsonDados.mensagem.trim()){
-            Alert.alert(oJsonDados.mensagem);
         } else {
-            navigation.navigate('Cliente', this.state);
-            //Alert.alert('Cadastrado não localizado.');
+
+            if (oJsonDados.mensagem && oJsonDados.mensagem.trim()){
+                Alert.alert(oJsonDados.mensagem);
+            }
+            oDadosCliente = this.state;
         }
+
+        navigation.navigate('ClienteDadosPessoais', oDadosCliente);
     }
 
     limpar() {
         let estado = this.state;
 
-        estado.nomeUsuario = '';
         estado.cpf = '';
         estado.email = '';
         this.setState(estado);
@@ -149,11 +144,12 @@ export class AreaDados extends Component {
     render() {
 
         return (
-            <View style={styles.areaDadosCliente}>                
-                <TextInput placeholder="E-mail" style={styles.textInput} onChangeText={(valor) => { this.props.dadosCliente.email = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>
-                <TextInput placeholder="CPF/ CNPJ" style={styles.textInput} onChangeText={(valor) => { this.props.dadosCliente.cpf = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>                
-                <TextInput placeholder="Nome Usuário" style={styles.textInput} onChangeText={(valor) => { this.props.dadosCliente.nomeUsuario = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>
-            </View>
+            <ScrollView>
+                <View style={styles.areaDadosCliente}>                
+                    <TextInput placeholder="E-mail" style={styles.textInput} onChangeText={(valor) => { this.props.dadosCliente.email = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>
+                    <TextInput placeholder="CPF/ CNPJ" style={styles.textInput} onChangeText={(valor) => { this.props.dadosCliente.cpf = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>
+                </View>
+            </ScrollView>
         );
     }
 }
@@ -169,15 +165,9 @@ export class AreaBotoes extends Component {
     }
 
     render() {
-        // const { navigation } = this.props;
         return (
             <View>
                 <Button title="Iniciar" onPress={this.props.obterCliente} ></Button>
-                {/* <Button title="Iniciar" onPress={() => {navigation.navigate('Cliente', {
-                    nomeUsuario: this.props.dadosCliente.nomeUsuario,
-                    cpf: this.props.dadosCliente.cpf,
-                    email: this.props.dadosCliente.email
-                })}} ></Button> */}
             </View>
         );
     }

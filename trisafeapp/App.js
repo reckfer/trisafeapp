@@ -6,38 +6,34 @@
  * @flow
  */
 
-import React, {Component} from 'react';
-import { createStackNavigator } from 'react-navigation-stack';
 import { createAppContainer } from 'react-navigation';
 import { createDrawerNavigator } from 'react-navigation-drawer';
-import Cliente from './src/Cliente';
 import ClienteInicio from './src/ClienteInicio';
+import ClienteDadosPessoais from './src/ClienteDadosPessoais';
+import ClienteEndereco from './src/ClienteEndereco';
+import ClienteSenha from './src/ClienteSenha';
+import ClienteConfirmacao from './src/ClienteConfirmacao';
 
 const AppNavigator = createDrawerNavigator({
-  ClienteInicio: {
-    screen: ClienteInicio
+    ClienteInicio: {
+      screen: ClienteInicio,
+      // key: '1'
+    },
+    ClienteDadosPessoais: {
+      screen: ClienteDadosPessoais,
+      // key: '2'
+    },
+    ClienteEndereco: {
+      screen: ClienteEndereco,
+      // key: '3'
+    },
+    ClienteConfirmacao: {
+      screen: ClienteConfirmacao,
+      // key: '5'
+    }
   },
-  Cliente: {
-    screen: Cliente
-  }
-},
-{});
+  {
+    initialRouteName: 'ClienteInicio'
+  });
 
 export default createAppContainer(AppNavigator);
-
-// /**
-//  * Arquivo principal do aplicativo da Trisafe.
-//  *
-//  * @format
-//  * @flow
-//  */
-
-// import React, {Component} from 'react';
-// import Cliente from './src/Cliente';
-
-// export default class App extends Component {
-
-//   render() {
-//     return (<Cliente />);    
-//   };
-// }
