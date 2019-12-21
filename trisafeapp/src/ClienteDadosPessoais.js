@@ -6,16 +6,14 @@
  */
 
 import React, { Component } from 'react';
+import { Input } from 'react-native-elements';
 import {
-    SafeAreaView,
     StyleSheet,
     ScrollView,
     Alert,
     View,
     Image,
     Text,
-    Console,
-    StatusBar,
     TextInput,
     Button
 } from 'react-native';
@@ -169,12 +167,12 @@ export class AreaDados extends Component {
         return (
             <ScrollView>
                 <View style={styles.areaDadosCliente}>
-                    <TextInput placeholder="Nome Completo" style={styles.textInput} value={this.props.dadosCliente.nomeCliente} onChangeText={(valor) => { this.props.dadosCliente.nomeCliente = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>                
-                    <TextInput placeholder="CPF" style={styles.textInput} value={this.props.dadosCliente.cpf} onChangeText={(valor) => { this.props.dadosCliente.cpf = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>
-                    <TextInput placeholder="RG" style={styles.textInput} value={this.props.dadosCliente.rg} onChangeText={(valor) => { this.props.dadosCliente.rg = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>                
-                    <TextInput placeholder="E-mail" style={styles.textInput} value={this.props.dadosCliente.email} onChangeText={(valor) => { this.props.dadosCliente.email = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>
-                    <TextInput placeholder="Telefone" style={styles.textInput} value={this.props.dadosCliente.telefone} onChangeText={(valor) => { this.props.dadosCliente.telefone = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>
-                    <TextInput placeholder="Nome Usuário" style={styles.textInput} value={this.props.dadosCliente.nomeUsuario} onChangeText={(valor) => { this.props.dadosCliente.nomeUsuario = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>               
+                    <Input placeholder="Nome Completo" label="Informe o seu Nome Completo:" containerStyle={styles.textInput} value={this.props.dadosCliente.nomeCliente} onChangeText={(valor) => { this.props.dadosCliente.nomeCliente = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
+                    <Input placeholder="CPF" label="Informe o seu CPF:" containerStyle={styles.textInput} value={this.props.dadosCliente.cpf} onChangeText={(valor) => { this.props.dadosCliente.cpf = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
+                    <Input placeholder="RG" label="Informe o seu RG:" containerStyle={styles.textInput} value={this.props.dadosCliente.rg} onChangeText={(valor) => { this.props.dadosCliente.rg = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>                
+                    <Input placeholder="E-mail" label="Informe o seu E-Mail:" containerStyle={styles.textInput}  onChangeText={(valor) => { this.props.dadosCliente.email = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}>{this.props.dadosCliente.email}</Input>
+                    <Input placeholder="Telefone" label="Informe o seu Telefone:" containerStyle={styles.textInput} value={this.props.dadosCliente.telefone} onChangeText={(valor) => { this.props.dadosCliente.telefone = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
+                    <Input placeholder="Nome de Usuário" label="Informe o seu Nome de Usuário:" containerStyle={styles.textInput} value={this.props.dadosCliente.nomeUsuario} onChangeText={(valor) => { this.props.dadosCliente.nomeUsuario = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
                 </View>
             </ScrollView>
         );
@@ -232,8 +230,11 @@ const styles = StyleSheet.create({
         borderColor: '#add8e6',
         borderWidth: 1,
         borderRadius: 7,
-        margin: 5,
+        marginTop: 5,
         backgroundColor: '#fffafa',
         alignSelf: 'stretch'
-    }
+    },
+    input: {
+        borderColor: '#add8e6'
+    },
 });

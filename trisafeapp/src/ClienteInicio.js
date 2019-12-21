@@ -6,18 +6,51 @@
  */
 
 import React, { Component } from 'react';
+import { ThemeProvider, Input, Button } from 'react-native-elements';
 import {
     StyleSheet,
     ScrollView,
-    SafeAreaView,
     Alert,
     View,
     Image,
     Text,
     TextInput,
-    Button
+    // Button
 } from 'react-native';
 import Util from './Util';
+
+const theme = {
+    Input: {
+        // labelStyle: {
+        //   color: 'red',
+        // },
+        containerStyle: {
+            marginTop: 12,
+            backgroundColor: '#fffafa',
+            borderRadius: 7,
+            alignSelf: 'stretch',
+            shadowColor: "#000",
+
+            shadowColor: "#000",
+            shadowOffset: {
+                width: 0,
+                height: 1,
+            },
+            shadowOpacity: 0.22,
+            shadowRadius: 2.22,
+            elevation: 3,
+        },
+        inputContainerStyle: {
+            borderWidth: 0,
+            borderColor: 'white',
+          },
+      },
+    Button: {
+        buttonStyle: {
+            width: 10,
+        },
+    }
+  };
 
 export default class ClienteInicio extends Component {
     static navigationOptions = {
@@ -25,9 +58,9 @@ export default class ClienteInicio extends Component {
     }
     constructor(props) {
         super(props);
-        this.state = { 
-            'cpf': '', 
-            'email': '' 
+        this.state = {
+            'cpf': '',
+            'email': ''
         };
         this.limpar = this.limpar.bind(this);
         this.capturarDadosCadastro = this.capturarDadosCadastro.bind(this);
@@ -38,10 +71,10 @@ export default class ClienteInicio extends Component {
 
     capturarDadosCadastro(oDadosCadastro) {
         let estado = this.state;
-    
+
         estado.cpf = oDadosCadastro.cpf;
         estado.email = oDadosCadastro.email;
-        
+
         this.setState(estado);
     }
 
@@ -49,7 +82,7 @@ export default class ClienteInicio extends Component {
         try {
             let estado = this.state;
             let url = objUtil.getURL('/clientes/obter/');
-            
+
             fetch(url, {
                 method: 'POST',
                 headers: {
@@ -77,9 +110,9 @@ export default class ClienteInicio extends Component {
     atribuirDadosCliente(oJsonDados) {
         const { navigation } = this.props;
         let oDadosCliente;
-        
+
         if(oJsonDados && oJsonDados.dados && oJsonDados.dados.trim()) {
-            
+
             oDadosCliente = oJsonDados.dados;
 
         } else {
@@ -100,7 +133,7 @@ export default class ClienteInicio extends Component {
         estado.email = '';
         this.setState(estado);
     }
-    
+
     render() {
         let dadosCliente = this.state;
         return (
@@ -119,7 +152,7 @@ export class Cabecalho extends Component {
         return (
             <View style={styles.areaCabecalho}>
                 <Image source={require(caminhoImagem)} />
-                <Titulo titulo='Meus dados' />
+                <Titulo titulo='Cadastro' nomeTela='Início' />
             </View>
         );
     }
@@ -130,6 +163,7 @@ export class Titulo extends Component {
         return (
             <View style={styles.areaTitulo}>
                 <Text style={styles.textoTitulo}>{this.props.titulo}</Text>
+                <Text style={styles.textoNomeTela}>{this.props.nomeTela}</Text>
             </View>
         );
     }
@@ -145,17 +179,19 @@ export class AreaDados extends Component {
 
         return (
             <ScrollView>
-                <View style={styles.areaDadosCliente}>                
-                    <TextInput placeholder="E-mail" style={styles.textInput} onChangeText={(valor) => { this.props.dadosCliente.email = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>
-                    <TextInput placeholder="CPF/ CNPJ" style={styles.textInput} onChangeText={(valor) => { this.props.dadosCliente.cpf = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>
-                </View>
+                <ThemeProvider theme={theme}>
+                    <View style={styles.areaDadosCliente}>
+                        <Input placeholder="Informe seu E-Mail" label="E-Mail" onChangeText={(valor) => { this.props.dadosCliente.email = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
+                        <Input placeholder="Informe seu CPF" label="CPF" onChangeText={(valor) => { this.props.dadosCliente.cpf = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
+                    </View>
+                </ThemeProvider>
             </ScrollView>
         );
     }
 }
 
 export class AreaBotoes extends Component {
-    
+
     static navigationOptions = {
         title: 'ClienteInicio'
     }
@@ -166,17 +202,17 @@ export class AreaBotoes extends Component {
 
     render() {
         return (
-            <View>
-                <Button title="Iniciar" onPress={this.props.obterCliente} ></Button>
+            <View style={styles.botao}>
+                <Button title="Iniciar" type="solid" raised={true} onPress={this.props.obterCliente} ></Button>
             </View>
         );
     }
 }
 
 function obterJsonResposta(oRespostaHTTP) {
-    
+
     if(oRespostaHTTP) {
-        return oRespostaHTTP.json();        
+        return oRespostaHTTP.json();
     }
     return null;
 }
@@ -190,9 +226,11 @@ const styles = StyleSheet.create({
         backgroundColor: '#f5f5f5'
     },
     areaDadosCliente: {
-        flexDirection: 'column',
-        justifyContent: 'space-around',
-        alignItems: 'stretch'
+        // flexDirection: 'column',
+        // justifyContent: 'space-around',
+        // alignItems: 'stretch'
+        // backgroundColor: '#2E9298',
+        padding: 10,       
     },
     areaCabecalho: {
         backgroundColor: '#f5f5f5',
@@ -208,17 +246,29 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     textoTitulo: {
+        fontSize: 20,
+        fontWeight: '200',
+        color: '#000000',
+        textAlign: 'center',
+        
+    },
+    textoNomeTela: {
         fontSize: 28,
         fontWeight: '300',
         color: '#000000',
         textAlign: 'center',
+        marginTop: 10,
     },
-    textInput: {
-        borderColor: '#add8e6',
-        borderWidth: 1,
-        borderRadius: 7,
-        margin: 5,
-        backgroundColor: '#fffafa',
-        alignSelf: 'stretch'
-    }
+    botao: {
+        padding: 20,
+        // borderColor: '#add8e6',
+        // borderWidth: 1,
+        // borderRadius: 7,
+        // marginTop: 12,
+        // backgroundColor: '#fffafa',
+        // alignSelf: 'stretch'
+    },
+    input: {
+        borderColor: '#add8e6'
+    },
 });
