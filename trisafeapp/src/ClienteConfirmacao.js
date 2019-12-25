@@ -7,16 +7,15 @@
 
 import React, { Component } from 'react';
 import {
-    StyleSheet,
     ScrollView,
     Alert,
-    View,
-    Image,
-    Text,
-    TextInput,
-    Button
+    View
 } from 'react-native';
 import Util from './Util';
+import { ThemeProvider, Input, Button } from 'react-native-elements';
+import Cabecalho from './common/CabecalhoTela';
+import { styles, theme } from './common/Estilos';
+import AreaBotoes from './common/AreaBotoes';
 
 export default class ClienteSenha extends Component {
     static navigationOptions = {
@@ -137,51 +136,30 @@ export default class ClienteSenha extends Component {
     render() {
         let dadosCliente = this.state;
         const { navigation } = this.props;        
+        let botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>
+        let botaoAvancar = () => <Button title="Confirmar" onPress={this.salvar} ></Button>
         
+        let botoesTela = [ { element: botaoVoltar }, { element: botaoAvancar } ];
+
         // Obtem os dados vindos da tela dados pessoais.
         dadosCliente.nomeCliente = navigation.getParam('nomeCliente', '');           
         dadosCliente.nomeUsuario = navigation.getParam('nomeUsuario', '');
         dadosCliente.cpf = navigation.getParam('cpf', '');
         dadosCliente.rg = navigation.getParam('rg', '');
         dadosCliente.email = navigation.getParam('email', '');
-        dadosCliente.telefone = navigation.getParam('telefone', '');
-        dadosCliente.cidade = navigation.getParam('cidade', '');
+        dadosCliente.telefone = navigation.getParam('telefone', '');        
         dadosCliente.rua = navigation.getParam('rua', '');
         dadosCliente.numero = navigation.getParam('numero', '');
         dadosCliente.complemento = navigation.getParam('complemento', '');
         dadosCliente.bairro = navigation.getParam('bairro', '');
         dadosCliente.cep = navigation.getParam('cep', '');
+        dadosCliente.cidade = navigation.getParam('cidade', '');
         dadosCliente.uf = navigation.getParam('uf', '');
-        // dadosCliente.senha = navigation.getParam('senha', '');
-        // dadosCliente.senhaConfirmacao = navigation.getParam('senhaConfirmacao', '');
-                
         return (
             <View style={styles.areaCliente}>
-                <Cabecalho />
+                <Cabecalho titulo='Cadastro' nomeTela='Confirmação' />
                 <AreaDados parentCallBack={this.capturarDadosFiltroCallBack} dadosCliente={dadosCliente}/>
-                <AreaBotoes salvar={this.salvar} voltar={this.voltar}/>
-            </View>
-        );
-    }
-}
-
-export class Cabecalho extends Component {
-    render() {
-        let caminhoImagem = '../multimidia/tri-logo-01.png';
-        return (
-            <View style={styles.areaCabecalho}>
-                <Image source={require(caminhoImagem)} />
-                <Titulo titulo='Meus dados' />
-            </View>
-        );
-    }
-}
-
-export class Titulo extends Component {
-    render() {
-        return (
-            <View style={styles.areaTitulo}>
-                <Text style={styles.textoTitulo}>{this.props.titulo}</Text>
+                <AreaBotoes botoes={botoesTela} />
             </View>
         );
     }
@@ -197,40 +175,28 @@ export class AreaDados extends Component {
 
         return (
             <ScrollView>
-                <View style={styles.areaDadosCliente}>
-                    <TextInput placeholder="Nome Completo" style={styles.textInput} value={this.props.dadosCliente.nomeCliente} onChangeText={(valor) => { this.props.dadosCliente.nomeCliente = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>                
-                    <TextInput placeholder="CPF" style={styles.textInput} value={this.props.dadosCliente.cpf} onChangeText={(valor) => { this.props.dadosCliente.cpf = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>
-                    <TextInput placeholder="RG" style={styles.textInput} value={this.props.dadosCliente.rg} onChangeText={(valor) => { this.props.dadosCliente.rg = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>                
-                    <TextInput placeholder="E-mail" style={styles.textInput} value={this.props.dadosCliente.email} onChangeText={(valor) => { this.props.dadosCliente.email = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>
-                    <TextInput placeholder="Telefone" style={styles.textInput} value={this.props.dadosCliente.telefone} onChangeText={(valor) => { this.props.dadosCliente.telefone = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>
-                    <TextInput placeholder="Nome Usuário" style={styles.textInput} value={this.props.dadosCliente.nomeUsuario} onChangeText={(valor) => { this.props.dadosCliente.nomeUsuario = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>               
-                    <TextInput placeholder="Cidade" style={styles.textInput} value={this.props.dadosCliente.cidade} onChangeText={(valor) => { this.props.dadosCliente.cidade = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>
-                    <TextInput placeholder="Rua" style={styles.textInput} value={this.props.dadosCliente.rua} onChangeText={(valor) => { this.props.dadosCliente.rua = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>
-                    <TextInput placeholder="Número" style={styles.textInput} value={this.props.dadosCliente.numero} onChangeText={(valor) => { this.props.dadosCliente.numero = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>
-                    <TextInput placeholder="Complemento" style={styles.textInput} value={this.props.dadosCliente.complemento} onChangeText={(valor) => { this.props.dadosCliente.complemento = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>
-                    <TextInput placeholder="Bairro" style={styles.textInput} value={this.props.dadosCliente.bairro} onChangeText={(valor) => { this.props.dadosCliente.bairro = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>                
-                    <TextInput placeholder="Cep" style={styles.textInput} value={this.props.dadosCliente.cep} onChangeText={(valor) => { this.props.dadosCliente.cep = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>
-                    <TextInput placeholder="Estado" style={styles.textInput} value={this.props.dadosCliente.uf} onChangeText={(valor) => { this.props.dadosCliente.uf = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>
-                </View>
+                <ThemeProvider theme={theme}>
+                    <View style={styles.areaDadosCliente}>
+                        <Input label="Nome Completo" disabled={true} style={styles.Input} value={this.props.dadosCliente.nomeCliente} onChangeText={(valor) => { this.props.dadosCliente.nomeCliente = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>                
+                        <Input label="E-mail" disabled={true} style={styles.Input} value={this.props.dadosCliente.email} onChangeText={(valor) => { this.props.dadosCliente.email = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
+                        <Input label="CPF" disabled={true} style={styles.Input} value={this.props.dadosCliente.cpf} onChangeText={(valor) => { this.props.dadosCliente.cpf = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
+                        <Input label="RG" disabled={true} style={styles.Input} value={this.props.dadosCliente.rg} onChangeText={(valor) => { this.props.dadosCliente.rg = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>                
+                        <Input label="Telefone" disabled={true} style={styles.Input} value={this.props.dadosCliente.telefone} onChangeText={(valor) => { this.props.dadosCliente.telefone = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
+                        <Input label="Nome Usuário" disabled={true} style={styles.Input} value={this.props.dadosCliente.nomeUsuario} onChangeText={(valor) => { this.props.dadosCliente.nomeUsuario = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
+                        <Input label="Rua" disabled={true} style={styles.Input} value={this.props.dadosCliente.rua} onChangeText={(valor) => { this.props.dadosCliente.rua = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
+                        <Input label="Número" disabled={true} style={styles.Input} value={this.props.dadosCliente.numero} onChangeText={(valor) => { this.props.dadosCliente.numero = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
+                        <Input label="Complemento" disabled={true} style={styles.Input} value={this.props.dadosCliente.complemento} onChangeText={(valor) => { this.props.dadosCliente.complemento = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
+                        <Input label="Bairro" disabled={true} style={styles.Input} value={this.props.dadosCliente.bairro} onChangeText={(valor) => { this.props.dadosCliente.bairro = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>                
+                        <Input label="Cep" disabled={true} style={styles.Input} value={this.props.dadosCliente.cep} onChangeText={(valor) => { this.props.dadosCliente.cep = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
+                        <Input label="Cidade" disabled={true} style={styles.Input} value={this.props.dadosCliente.cidade} onChangeText={(valor) => { this.props.dadosCliente.cidade = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
+                        <Input label="Estado" disabled={true} style={styles.Input} value={this.props.dadosCliente.uf} onChangeText={(valor) => { this.props.dadosCliente.uf = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
+                    </View>
+                </ThemeProvider>
             </ScrollView>       
         );
     }
 }
 
-export class AreaBotoes extends Component {
-    
-    constructor(props) {
-        super(props);
-    }
-    render() {
-        return (
-            <View>
-                <Button title="Confirmar" onPress={this.props.salvar} color="#4682b4" ></Button>
-                <Button title="Voltar" onPress={this.props.voltar} color="#4682b4" ></Button>
-            </View>
-        );
-    }
-}
 function obterJsonResposta(oRespostaHTTP) {
     
     if(oRespostaHTTP) {
@@ -238,45 +204,3 @@ function obterJsonResposta(oRespostaHTTP) {
     }
     return null;
 }
-
-const styles = StyleSheet.create({
-    areaCliente: {
-        flex: 1,
-        flexDirection: 'column',
-        justifyContent: 'flex-start',
-        alignItems: 'stretch',
-        backgroundColor: '#f5f5f5'
-    },
-    areaDadosCliente: {
-        flexDirection: 'column',
-        justifyContent: 'space-around',
-        alignItems: 'stretch'
-    },
-    areaCabecalho: {
-        backgroundColor: '#f5f5f5',
-        flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: 10
-    },
-    areaTitulo: {
-        flex: 1,
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    textoTitulo: {
-        fontSize: 28,
-        fontWeight: '300',
-        color: '#000000',
-        textAlign: 'center',
-    },
-    textInput: {
-        borderColor: '#add8e6',
-        borderWidth: 1,
-        borderRadius: 7,
-        margin: 5,
-        backgroundColor: '#fffafa',
-        alignSelf: 'stretch'
-    }
-});

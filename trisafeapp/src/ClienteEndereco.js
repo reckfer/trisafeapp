@@ -7,17 +7,15 @@
 
 import React, { Component } from 'react';
 import {
-    StyleSheet,
     ScrollView,
     Alert,
     View,
-    Image,
-    Text,
-    TextInput,
-    Button,
-    NavigationActions
 } from 'react-native';
+import { ThemeProvider, Input, Button } from 'react-native-elements';
 import Util from './Util';
+import Cabecalho from './common/CabecalhoTela';
+import { styles, theme } from './common/Estilos';
+import AreaBotoes from './common/AreaBotoes';
 
 export default class ClienteEndereco extends Component {
     static navigationOptions = {
@@ -124,7 +122,11 @@ export default class ClienteEndereco extends Component {
 
     render() {
         let dadosCliente = this.state;
-        const { navigation } = this.props;        
+        const { navigation } = this.props;
+        let botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>
+        let botaoAvancar = () => <Button title="Avançar" onPress={this.confirmar} ></Button>
+        
+        let botoesTela = [ { element: botaoVoltar }, { element: botaoAvancar } ];
         
         if(!dadosCliente.emCadastro) {
             // Obtem os dados vindos da tela dados pessoais.
@@ -137,34 +139,10 @@ export default class ClienteEndereco extends Component {
             dadosCliente.telefone = navigation.getParam('telefone', '');
         }
         return (
-            <ScrollView>
-                <View style={styles.areaCliente}>
-                    <Cabecalho />
-                    <AreaDados capturarDadosCallBack={this.capturarDadosCadastro} dadosCliente={dadosCliente}/>
-                    <AreaBotoes confirmar={this.confirmar} voltar={this.voltar}/>
-                </View>
-            </ScrollView>
-        );
-    }
-}
-
-export class Cabecalho extends Component {
-    render() {
-        let caminhoImagem = '../multimidia/tri-logo-01.png';
-        return (
-            <View style={styles.areaCabecalho}>
-                <Image source={require(caminhoImagem)} />
-                <Titulo titulo='Meus dados' />
-            </View>
-        );
-    }
-}
-
-export class Titulo extends Component {
-    render() {
-        return (
-            <View style={styles.areaTitulo}>
-                <Text style={styles.textoTitulo}>{this.props.titulo}</Text>
+            <View style={styles.areaCliente}>
+                <Cabecalho titulo='Cadastro' nomeTela='Endereço' />
+                <AreaDados capturarDadosCallBack={this.capturarDadosCadastro} dadosCliente={dadosCliente}/>
+                <AreaBotoes botoes={botoesTela} />
             </View>
         );
     }
@@ -179,79 +157,19 @@ export class AreaDados extends Component {
     render() {
 
         return (
-            <View style={styles.areaDadosCliente}>
-                <TextInput placeholder="Cidade" style={styles.textInput} value={this.props.dadosCliente.cidade} onChangeText={(valor) => { this.props.dadosCliente.cidade = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>
-                <TextInput placeholder="Rua" style={styles.textInput} value={this.props.dadosCliente.rua} onChangeText={(valor) => { this.props.dadosCliente.rua = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>
-                <TextInput placeholder="Número" style={styles.textInput} value={this.props.dadosCliente.numero} onChangeText={(valor) => { this.props.dadosCliente.numero = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>
-                <TextInput placeholder="Complemento" style={styles.textInput} value={this.props.dadosCliente.complemento} onChangeText={(valor) => { this.props.dadosCliente.complemento = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>
-                <TextInput placeholder="Bairro" style={styles.textInput} value={this.props.dadosCliente.bairro} onChangeText={(valor) => { this.props.dadosCliente.bairro = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>                
-                <TextInput placeholder="Cep" style={styles.textInput} value={this.props.dadosCliente.cep} onChangeText={(valor) => { this.props.dadosCliente.cep = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>
-                <TextInput placeholder="Estado" style={styles.textInput} value={this.props.dadosCliente.uf} onChangeText={(valor) => { this.props.dadosCliente.uf = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></TextInput>
-            </View>
+            <ScrollView>
+                <ThemeProvider theme={theme}>
+                    <View style={styles.areaDadosCliente}>
+                        <Input placeholder="Informe sua Rua" label="Rua" value={this.props.dadosCliente.rua} onChangeText={(valor) => { this.props.dadosCliente.rua = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
+                        <Input placeholder="Informe seu Número" label="Número" value={this.props.dadosCliente.numero} onChangeText={(valor) => { this.props.dadosCliente.numero = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
+                        <Input placeholder="Informe seu Complemento" label="Complemento" value={this.props.dadosCliente.complemento} onChangeText={(valor) => { this.props.dadosCliente.complemento = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
+                        <Input placeholder="Informe seu Bairro" label="Bairro" value={this.props.dadosCliente.bairro} onChangeText={(valor) => { this.props.dadosCliente.bairro = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>                
+                        <Input placeholder="Informe seu Cep" label="Cep" value={this.props.dadosCliente.cep} onChangeText={(valor) => { this.props.dadosCliente.cep = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
+                        <Input placeholder="Informe sua Cidade" label="Cidade" value={this.props.dadosCliente.cidade} onChangeText={(valor) => { this.props.dadosCliente.cidade = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
+                        <Input placeholder="Informe seu Estado" label="Estado" value={this.props.dadosCliente.uf} onChangeText={(valor) => { this.props.dadosCliente.uf = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
+                    </View>
+                </ThemeProvider>
+            </ScrollView>
         );
     }
 }
-
-export class AreaBotoes extends Component {
-    
-    constructor(props) {
-        super(props);
-    }
-    render() {
-        return (
-            <View>
-                <Button title="Confirmar" onPress={this.props.confirmar} color="#4682b4" ></Button>
-                <Button title="Voltar" onPress={this.props.voltar} color="#4682b4" ></Button>
-            </View>
-        );
-    }
-}
-function obterJsonResposta(oRespostaHTTP) {
-    
-    if(oRespostaHTTP) {
-        return oRespostaHTTP.json();        
-    }
-    return null;
-}
-
-const styles = StyleSheet.create({
-    areaCliente: {
-        flex: 1,
-        flexDirection: 'column',
-        justifyContent: 'flex-start',
-        alignItems: 'stretch',
-        backgroundColor: '#f5f5f5'
-    },
-    areaDadosCliente: {
-        flexDirection: 'column',
-        justifyContent: 'space-around',
-        alignItems: 'stretch'
-    },
-    areaCabecalho: {
-        backgroundColor: '#f5f5f5',
-        flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: 10
-    },
-    areaTitulo: {
-        flex: 1,
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    textoTitulo: {
-        fontSize: 28,
-        fontWeight: '300',
-        color: '#000000',
-        textAlign: 'center',
-    },
-    textInput: {
-        borderColor: '#add8e6',
-        borderWidth: 1,
-        borderRadius: 7,
-        margin: 5,
-        backgroundColor: '#fffafa',
-        alignSelf: 'stretch'
-    }
-});

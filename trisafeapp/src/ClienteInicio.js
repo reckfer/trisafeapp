@@ -6,51 +6,16 @@
  */
 
 import React, { Component } from 'react';
-import { ThemeProvider, Input, Button } from 'react-native-elements';
+import { ThemeProvider, Input, Button} from 'react-native-elements';
 import {
-    StyleSheet,
     ScrollView,
     Alert,
     View,
-    Image,
-    Text,
-    TextInput,
-    // Button
 } from 'react-native';
 import Util from './Util';
-
-const theme = {
-    Input: {
-        // labelStyle: {
-        //   color: 'red',
-        // },
-        containerStyle: {
-            marginTop: 12,
-            backgroundColor: '#fffafa',
-            borderRadius: 7,
-            alignSelf: 'stretch',
-            shadowColor: "#000",
-
-            shadowColor: "#000",
-            shadowOffset: {
-                width: 0,
-                height: 1,
-            },
-            shadowOpacity: 0.22,
-            shadowRadius: 2.22,
-            elevation: 3,
-        },
-        inputContainerStyle: {
-            borderWidth: 0,
-            borderColor: 'white',
-          },
-      },
-    Button: {
-        buttonStyle: {
-            width: 10,
-        },
-    }
-  };
+import Cabecalho from './common/CabecalhoTela';
+import AreaBotoes from './common/AreaBotoes';
+import { styles, theme } from './common/Estilos';
 
 export default class ClienteInicio extends Component {
     static navigationOptions = {
@@ -133,37 +98,17 @@ export default class ClienteInicio extends Component {
         estado.email = '';
         this.setState(estado);
     }
+    botaoIniciar = () => <Button title="Iniciar" onPress={this.obterCliente} ></Button>
 
     render() {
         let dadosCliente = this.state;
+        let botoesTela = [ { element: this.botaoIniciar } ];
+
         return (
             <View style={styles.areaCliente}>
-                <Cabecalho />
+                <Cabecalho titulo='Cadastro' nomeTela='Início' />
                 <AreaDados parentCallBack={this.capturarDadosFiltroCallBack} capturarDadosCallBack={this.capturarDadosCadastro} dadosCliente={dadosCliente}/>
-                <AreaBotoes limpar={this.limpar} navigation = {this.props.navigation} obterCliente={this.obterCliente} dadosCliente={dadosCliente}/>
-            </View>
-        );
-    }
-}
-
-export class Cabecalho extends Component {
-    render() {
-        let caminhoImagem = '../multimidia/tri-logo-01.png';
-        return (
-            <View style={styles.areaCabecalho}>
-                <Image source={require(caminhoImagem)} />
-                <Titulo titulo='Cadastro' nomeTela='Início' />
-            </View>
-        );
-    }
-}
-
-export class Titulo extends Component {
-    render() {
-        return (
-            <View style={styles.areaTitulo}>
-                <Text style={styles.textoTitulo}>{this.props.titulo}</Text>
-                <Text style={styles.textoNomeTela}>{this.props.nomeTela}</Text>
+                <AreaBotoes botoes={botoesTela} />
             </View>
         );
     }
@@ -190,25 +135,6 @@ export class AreaDados extends Component {
     }
 }
 
-export class AreaBotoes extends Component {
-
-    static navigationOptions = {
-        title: 'ClienteInicio'
-    }
-
-    constructor(props) {
-        super(props);
-    }
-
-    render() {
-        return (
-            <View style={styles.botao}>
-                <Button title="Iniciar" type="solid" raised={true} onPress={this.props.obterCliente} ></Button>
-            </View>
-        );
-    }
-}
-
 function obterJsonResposta(oRespostaHTTP) {
 
     if(oRespostaHTTP) {
@@ -216,59 +142,3 @@ function obterJsonResposta(oRespostaHTTP) {
     }
     return null;
 }
-
-const styles = StyleSheet.create({
-    areaCliente: {
-        flex: 1,
-        flexDirection: 'column',
-        justifyContent: 'flex-start',
-        alignItems: 'stretch',
-        backgroundColor: '#f5f5f5'
-    },
-    areaDadosCliente: {
-        // flexDirection: 'column',
-        // justifyContent: 'space-around',
-        // alignItems: 'stretch'
-        // backgroundColor: '#2E9298',
-        padding: 10,       
-    },
-    areaCabecalho: {
-        backgroundColor: '#f5f5f5',
-        flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: 10
-    },
-    areaTitulo: {
-        flex: 1,
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    textoTitulo: {
-        fontSize: 20,
-        fontWeight: '200',
-        color: '#000000',
-        textAlign: 'center',
-        
-    },
-    textoNomeTela: {
-        fontSize: 28,
-        fontWeight: '300',
-        color: '#000000',
-        textAlign: 'center',
-        marginTop: 10,
-    },
-    botao: {
-        padding: 20,
-        // borderColor: '#add8e6',
-        // borderWidth: 1,
-        // borderRadius: 7,
-        // marginTop: 12,
-        // backgroundColor: '#fffafa',
-        // alignSelf: 'stretch'
-    },
-    input: {
-        borderColor: '#add8e6'
-    },
-});

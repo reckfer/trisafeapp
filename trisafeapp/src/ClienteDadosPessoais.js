@@ -6,18 +6,16 @@
  */
 
 import React, { Component } from 'react';
-import { Input } from 'react-native-elements';
 import {
-    StyleSheet,
     ScrollView,
     Alert,
     View,
-    Image,
-    Text,
-    TextInput,
-    Button
 } from 'react-native';
 import Util from './Util';
+import { ThemeProvider, Input, Button } from 'react-native-elements';
+import Cabecalho from './common/CabecalhoTela';
+import { styles, theme } from './common/Estilos';
+import AreaBotoes from './common/AreaBotoes';
 
 export default class ClienteDadosPessoais extends Component {
     static navigationOptions = {
@@ -117,6 +115,10 @@ export default class ClienteDadosPessoais extends Component {
     render() {
         let dadosCliente = this.state;
         const { navigation } = this.props;        
+        let botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>
+        let botaoAvancar = () => <Button title="Avançar" onPress={this.confirmar} ></Button>
+        
+        let botoesTela = [ { element: botaoVoltar }, { element: botaoAvancar } ];
 
         if(!dadosCliente.emCadastro) {
             // Obtem os dados vindos da primeira tela.
@@ -126,31 +128,9 @@ export default class ClienteDadosPessoais extends Component {
 
         return (
             <View style={styles.areaCliente}>
-                <Cabecalho />
+                <Cabecalho titulo='Cadastro' nomeTela='Meus dados' />
                 <AreaDados capturarDadosCallBack={this.capturarDadosCadastro} dadosCliente={dadosCliente}/>
-                <AreaBotoes confirmar={this.confirmar} voltar={this.voltar}/>
-            </View>
-        );
-    }
-}
-
-export class Cabecalho extends Component {
-    render() {
-        let caminhoImagem = '../multimidia/tri-logo-01.png';
-        return (
-            <View style={styles.areaCabecalho}>
-                <Image source={require(caminhoImagem)} />
-                <Titulo titulo='Meus dados' />
-            </View>
-        );
-    }
-}
-
-export class Titulo extends Component {
-    render() {
-        return (
-            <View style={styles.areaTitulo}>
-                <Text style={styles.textoTitulo}>{this.props.titulo}</Text>
+                <AreaBotoes botoes={botoesTela}/>
             </View>
         );
     }
@@ -166,75 +146,17 @@ export class AreaDados extends Component {
 
         return (
             <ScrollView>
-                <View style={styles.areaDadosCliente}>
-                    <Input placeholder="Nome Completo" label="Informe o seu Nome Completo:" containerStyle={styles.textInput} value={this.props.dadosCliente.nomeCliente} onChangeText={(valor) => { this.props.dadosCliente.nomeCliente = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
-                    <Input placeholder="CPF" label="Informe o seu CPF:" containerStyle={styles.textInput} value={this.props.dadosCliente.cpf} onChangeText={(valor) => { this.props.dadosCliente.cpf = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
-                    <Input placeholder="RG" label="Informe o seu RG:" containerStyle={styles.textInput} value={this.props.dadosCliente.rg} onChangeText={(valor) => { this.props.dadosCliente.rg = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>                
-                    <Input placeholder="E-mail" label="Informe o seu E-Mail:" containerStyle={styles.textInput}  onChangeText={(valor) => { this.props.dadosCliente.email = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}>{this.props.dadosCliente.email}</Input>
-                    <Input placeholder="Telefone" label="Informe o seu Telefone:" containerStyle={styles.textInput} value={this.props.dadosCliente.telefone} onChangeText={(valor) => { this.props.dadosCliente.telefone = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
-                    <Input placeholder="Nome de Usuário" label="Informe o seu Nome de Usuário:" containerStyle={styles.textInput} value={this.props.dadosCliente.nomeUsuario} onChangeText={(valor) => { this.props.dadosCliente.nomeUsuario = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
-                </View>
+                <ThemeProvider theme={theme}>
+                    <View style={styles.areaDadosCliente}>
+                        <Input placeholder="Informe seu Nome Completo" label="Nome Completo" value={this.props.dadosCliente.nomeCliente} onChangeText={(valor) => { this.props.dadosCliente.nomeCliente = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
+                        <Input placeholder="Informe seu E-Mail" label="E-mail" onChangeText={(valor) => { this.props.dadosCliente.email = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}>{this.props.dadosCliente.email}</Input>
+                        <Input placeholder="Informe seu CPF" label="CPF" value={this.props.dadosCliente.cpf} onChangeText={(valor) => { this.props.dadosCliente.cpf = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
+                        <Input placeholder="Informe seu RG" label="RG" value={this.props.dadosCliente.rg} onChangeText={(valor) => { this.props.dadosCliente.rg = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>                
+                        <Input placeholder="Informe seu Telefone" label="Telefone" value={this.props.dadosCliente.telefone} onChangeText={(valor) => { this.props.dadosCliente.telefone = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
+                        <Input placeholder="Informe seu Nome de Usuário" label="Nome de Usuário" value={this.props.dadosCliente.nomeUsuario} onChangeText={(valor) => { this.props.dadosCliente.nomeUsuario = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
+                    </View>
+                </ThemeProvider>
             </ScrollView>
         );
     }
 }
-
-export class AreaBotoes extends Component {
-    
-    constructor(props) {
-        super(props);
-    }
-    render() {
-        return (
-            <View>
-                <Button title="Confirmar" onPress={this.props.confirmar} color="#4682b4" ></Button>
-                <Button title="Voltar" onPress={this.props.voltar} color="#4682b4" ></Button>
-            </View>
-        );
-    }
-}
-
-const styles = StyleSheet.create({
-    areaCliente: {
-        flex: 1,
-        flexDirection: 'column',
-        justifyContent: 'flex-start',
-        alignItems: 'stretch',
-        backgroundColor: '#f5f5f5'
-    },
-    areaDadosCliente: {
-        flexDirection: 'column',
-        justifyContent: 'space-around',
-        alignItems: 'stretch'
-    },
-    areaCabecalho: {
-        backgroundColor: '#f5f5f5',
-        flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: 10
-    },
-    areaTitulo: {
-        flex: 1,
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    textoTitulo: {
-        fontSize: 28,
-        fontWeight: '300',
-        color: '#000000',
-        textAlign: 'center',
-    },
-    textInput: {
-        borderColor: '#add8e6',
-        borderWidth: 1,
-        borderRadius: 7,
-        marginTop: 5,
-        backgroundColor: '#fffafa',
-        alignSelf: 'stretch'
-    },
-    input: {
-        borderColor: '#add8e6'
-    },
-});
