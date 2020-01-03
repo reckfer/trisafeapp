@@ -18,10 +18,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#f5f5f5'
     },
     areaDadosCliente: {
-        // flexDirection: 'column',
-        // justifyContent: 'space-around',
-        // alignItems: 'stretch'
-        // backgroundColor: '#2E9298',
         padding: 10,       
     },
     areaCabecalho: {
@@ -53,12 +49,6 @@ const styles = StyleSheet.create({
     },
     botao: {
         padding: 20,
-        // borderColor: '#add8e6',
-        // borderWidth: 1,
-        // borderRadius: 7,
-        // marginTop: 12,
-        // backgroundColor: '#fffafa',
-        // alignSelf: 'stretch'
     },
     input: {
         borderColor: '#add8e6'
@@ -67,9 +57,6 @@ const styles = StyleSheet.create({
 
 const theme = {
     Input: {
-        // labelStyle: {
-        //   color: 'red',
-        // },
         containerStyle: {
             marginTop: 12,
             backgroundColor: '#fffafa',

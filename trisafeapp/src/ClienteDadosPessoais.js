@@ -11,7 +11,7 @@ import {
     Alert,
     View,
 } from 'react-native';
-import Util from './Util';
+import Util from './common/Util';
 import { ThemeProvider, Input, Button } from 'react-native-elements';
 import Cabecalho from './common/CabecalhoTela';
 import { styles, theme } from './common/Estilos';
@@ -23,21 +23,14 @@ export default class ClienteDadosPessoais extends Component {
     }
     constructor(props) {
         super(props);
-        this.state = { 
-            'codigo': '', 
-            'nomeCliente': '', 
-            'cpf': '', 
-            'rg': '', 
-            'email': '', 
-            'nomeUsuario': '',
-            'telefone': ''
-        };
         this.limpar = this.limpar.bind(this);
         this.voltar = this.voltar.bind(this);
         this.confirmar = this.confirmar.bind(this);
         this.atribuirDadosCliente = this.atribuirDadosCliente.bind(this);
         this.capturarDadosCadastro = this.capturarDadosCadastro.bind(this);
+        
         objUtil = new Util();
+        this.state = objUtil.inicializarDadosCliente();
     }
 
     tratarRetornoJson(oJsonResposta) {
@@ -103,7 +96,7 @@ export default class ClienteDadosPessoais extends Component {
     
         estado.cpf = oDadosCadastro.cpf;
         estado.rg = oDadosCadastro.rg;
-        estado.nomeCliente = oDadosCadastro.nomeCliente;
+        estado.nome = oDadosCadastro.nome;
         estado.nomeUsuario = oDadosCadastro.nomeUsuario;
         estado.email = oDadosCadastro.email;
         estado.telefone = oDadosCadastro.telefone;
@@ -122,10 +115,9 @@ export default class ClienteDadosPessoais extends Component {
 
         if(!dadosCliente.emCadastro) {
             // Obtem os dados vindos da primeira tela.
-            dadosCliente.email = navigation.getParam('email', '');
-            dadosCliente.cpf = navigation.getParam('cpf', '');
+            objUtil.lerDadosNavegacao(dadosCliente, navigation);
         }
-
+        
         return (
             <View style={styles.areaCliente}>
                 <Cabecalho titulo='Cadastro' nomeTela='Meus dados' />
@@ -148,7 +140,7 @@ export class AreaDados extends Component {
             <ScrollView>
                 <ThemeProvider theme={theme}>
                     <View style={styles.areaDadosCliente}>
-                        <Input placeholder="Informe seu Nome Completo" label="Nome Completo" value={this.props.dadosCliente.nomeCliente} onChangeText={(valor) => { this.props.dadosCliente.nomeCliente = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
+                        <Input placeholder="Informe seu Nome Completo" label="Nome Completo" value={this.props.dadosCliente.nome} onChangeText={(valor) => { this.props.dadosCliente.nome = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
                         <Input placeholder="Informe seu E-Mail" label="E-mail" onChangeText={(valor) => { this.props.dadosCliente.email = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}>{this.props.dadosCliente.email}</Input>
                         <Input placeholder="Informe seu CPF" label="CPF" value={this.props.dadosCliente.cpf} onChangeText={(valor) => { this.props.dadosCliente.cpf = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
                         <Input placeholder="Informe seu RG" label="RG" value={this.props.dadosCliente.rg} onChangeText={(valor) => { this.props.dadosCliente.rg = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>                

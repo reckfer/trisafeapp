@@ -12,7 +12,7 @@ import {
     Alert,
     View,
 } from 'react-native';
-import Util from './Util';
+import Util from './common/Util';
 import Cabecalho from './common/CabecalhoTela';
 import AreaBotoes from './common/AreaBotoes';
 import { styles, theme } from './common/Estilos';
@@ -23,15 +23,14 @@ export default class ClienteInicio extends Component {
     }
     constructor(props) {
         super(props);
-        this.state = {
-            'cpf': '',
-            'email': ''
-        };
+        
         this.limpar = this.limpar.bind(this);
         this.capturarDadosCadastro = this.capturarDadosCadastro.bind(this);
         this.obterCliente = this.obterCliente.bind(this);
-        this.atribuirDadosCliente = this.atribuirDadosCliente.bind(this);
+        this.tratarDadosCliente = this.tratarDadosCliente.bind(this);
         objUtil = new Util();
+
+        this.state = objUtil.inicializarDadosCliente();
     }
 
     capturarDadosCadastro(oDadosCadastro) {
@@ -59,9 +58,9 @@ export default class ClienteInicio extends Component {
                   email: estado.email
                 }),
               })
-                .then(obterJsonResposta)
+                .then(objUtil.obterJsonResposta)
                 .then((oJsonDados) => {
-                    this.atribuirDadosCliente(oJsonDados);
+                    objUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosCliente, true);
                 })
                 .catch(function (erro) {
                     Alert.alert(erro.message);
@@ -71,23 +70,21 @@ export default class ClienteInicio extends Component {
             Alert.alert(exc);
         }
     }
-
-    atribuirDadosCliente(oJsonDados) {
+    tratarDadosCliente(oDados, oEstado) {
         const { navigation } = this.props;
         let oDadosCliente;
 
-        if(oJsonDados && oJsonDados.dados && oJsonDados.dados.trim()) {
-
-            oDadosCliente = oJsonDados.dados;
-
+        if(oEstado.cod_mensagem === 'NaoCadastrado') {
+            Alert.alert('Seu cadastro não foi localizado. Realize seu cadastro preenchendo os dados solicitados.');
+        } else if (oEstado.mensagem && oEstado.mensagem.trim()) {
+            Alert.alert(oEstado.mensagem);
+        }
+        if(oDados) {
+            oDadosCliente = oDados;
         } else {
-
-            if (oJsonDados.mensagem && oJsonDados.mensagem.trim()){
-                Alert.alert(oJsonDados.mensagem);
-            }
             oDadosCliente = this.state;
         }
-
+        oDadosCliente.emCadastro = true;
         navigation.navigate('ClienteDadosPessoais', oDadosCliente);
     }
 
@@ -103,7 +100,7 @@ export default class ClienteInicio extends Component {
     render() {
         let dadosCliente = this.state;
         let botoesTela = [ { element: this.botaoIniciar } ];
-
+        
         return (
             <View style={styles.areaCliente}>
                 <Cabecalho titulo='Cadastro' nomeTela='Início' />
@@ -133,12 +130,4 @@ export class AreaDados extends Component {
             </ScrollView>
         );
     }
-}
-
-function obterJsonResposta(oRespostaHTTP) {
-
-    if(oRespostaHTTP) {
-        return oRespostaHTTP.json();
-    }
-    return null;
 }

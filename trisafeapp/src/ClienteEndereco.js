@@ -12,7 +12,7 @@ import {
     View,
 } from 'react-native';
 import { ThemeProvider, Input, Button } from 'react-native-elements';
-import Util from './Util';
+import Util from './common/Util';
 import Cabecalho from './common/CabecalhoTela';
 import { styles, theme } from './common/Estilos';
 import AreaBotoes from './common/AreaBotoes';
@@ -23,27 +23,14 @@ export default class ClienteEndereco extends Component {
     }
     constructor(props) {
         super(props);
-        this.state = { 
-            'nomeCliente': '', 
-            'cpf': '', 
-            'rg': '', 
-            'email': '', 
-            'nomeUsuario': '',
-            'telefone': '',
-            'cidade': '',
-            'rua': '',
-            'numero': '',
-            'complemento': '',
-            'bairro': '',
-            'cep': '',
-            'uf': ''
-        };
         this.limpar = this.limpar.bind(this);
         this.confirmar = this.confirmar.bind(this);
         this.voltar = this.voltar.bind(this);
         this.atribuirDadosCliente = this.atribuirDadosCliente.bind(this);
         this.capturarDadosCadastro = this.capturarDadosCadastro.bind(this);
+        
         objUtil = new Util();
+        this.state = objUtil.inicializarDadosCliente();
     }
 
     tratarRetornoJson(oJsonResposta) {
@@ -130,13 +117,7 @@ export default class ClienteEndereco extends Component {
         
         if(!dadosCliente.emCadastro) {
             // Obtem os dados vindos da tela dados pessoais.
-            dadosCliente.codigo = navigation.getParam('codigo', '');
-            dadosCliente.nomeCliente = navigation.getParam('nomeCliente', '');           
-            dadosCliente.nomeUsuario = navigation.getParam('nomeUsuario', '');
-            dadosCliente.cpf = navigation.getParam('cpf', '');
-            dadosCliente.rg = navigation.getParam('rg', '');
-            dadosCliente.email = navigation.getParam('email', '');
-            dadosCliente.telefone = navigation.getParam('telefone', '');
+            objUtil.lerDadosNavegacao(dadosCliente, navigation);
         }
         return (
             <View style={styles.areaCliente}>

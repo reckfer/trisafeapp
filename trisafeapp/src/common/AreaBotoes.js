@@ -10,7 +10,6 @@ import {
     View,
 } from 'react-native';
 import { ButtonGroup } from 'react-native-elements';
-// import { styles} from './Estilos';
 
 export default class AreaBotoes extends Component {
 
