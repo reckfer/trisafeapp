@@ -50,9 +50,12 @@ export default class Util {
     }
 
     lerDadosNavegacao(dadosCliente, navigation) {
-        
+        let valor;
         for(chave in dadosCliente) {
-            dadosCliente[chave] = navigation.getParam(chave, '');
+            valor = navigation.getParam(chave);
+            if(typeof(valor) === 'string' && valor.trim()) {
+                dadosCliente[chave] = valor;
+            }
         }
     }
 
@@ -71,6 +74,7 @@ export default class Util {
             'bairro': '',
             'cep': '',
             'uf': '',
+            'processandoRequisicao': false,
         };
     }
 }

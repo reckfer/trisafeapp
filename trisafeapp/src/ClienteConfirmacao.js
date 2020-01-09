@@ -34,17 +34,12 @@ export default class ClienteConfirmacao extends Component {
         this.state = objUtil.inicializarDadosCliente();
     }
 
-    tratarRetornoJson(oJsonResposta) {
-    
-        Alert.alert(oJsonResposta.mensagem);
-        if(oJsonResposta && !oJsonResposta.ok) {
-            
-            return null;
-        }
-        return oJsonResposta;
-    }
-
     tratarDadosRetorno(oDados, oEstado) {
+        let estado = this.state;
+
+        estado.processandoRequisicao = false;
+        this.setState(estado);
+
         if (oEstado.mensagem && oEstado.mensagem.trim()) {
             Alert.alert(oEstado.mensagem);
         }
@@ -55,8 +50,11 @@ export default class ClienteConfirmacao extends Component {
 
     salvar() {
         try {
-            let estado = this.state;            
             let url = objUtil.getURL('/clientes/incluir/');
+            let estado = this.state;
+            
+            estado.processandoRequisicao = true;
+            this.setState(estado);
 
             fetch(url, {
                     method: 'POST',
@@ -100,13 +98,14 @@ export default class ClienteConfirmacao extends Component {
         navigation.navigate('ClienteEndereco', this.state);
     }
 
+    botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;        
+    botaoConfirmar = () => <Button title="Confirmar" onPress={this.salvar} loading={this.state.processandoRequisicao} ></Button>;
+
     render() {
         let dadosCliente = this.state;
         const { navigation } = this.props;        
-        let botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>
-        let botaoConfirmar = () => <Button title="Confirmar" onPress={this.salvar} ></Button>
-        
-        let botoesTela = [ { element: botaoVoltar }, { element: botaoConfirmar } ];
+
+        let botoesTela = [ { element: this.botaoVoltar }, { element: this.botaoConfirmar } ];
 
         // Obtem os dados vindos da tela dados pessoais.
         objUtil.lerDadosNavegacao(dadosCliente, navigation);
@@ -151,12 +150,4 @@ export class AreaDados extends Component {
             </ScrollView>       
         );
     }
-}
-
-function obterJsonResposta(oRespostaHTTP) {
-    
-    if(oRespostaHTTP) {
-        return oRespostaHTTP.json();        
-    }
-    return null;
 }

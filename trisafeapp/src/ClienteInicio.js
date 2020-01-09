@@ -44,8 +44,11 @@ export default class ClienteInicio extends Component {
 
     obterCliente() {
         try {
-            let estado = this.state;
+            let estado = this.state;            
             let url = objUtil.getURL('/clientes/obter/');
+
+            estado.processandoRequisicao = true;
+            this.setState(estado);
 
             fetch(url, {
                 method: 'POST',
@@ -67,7 +70,8 @@ export default class ClienteInicio extends Component {
                     throw erro;
                 });
         } catch (exc) {
-            Alert.alert(exc);
+            Alert.alert(exc.message);
+            throw exc;
         }
     }
     tratarDadosCliente(oDados, oEstado) {
@@ -75,7 +79,7 @@ export default class ClienteInicio extends Component {
         let oDadosCliente;
 
         if(oEstado.cod_mensagem === 'NaoCadastrado') {
-            Alert.alert('Seu cadastro não foi localizado. Realize seu cadastro preenchendo os dados solicitados.');
+            Alert.alert('Seu cadastro não foi localizado. Preencha os dados solicitados para realizá-lo.');
         } else if (oEstado.mensagem && oEstado.mensagem.trim()) {
             Alert.alert(oEstado.mensagem);
         }
@@ -84,6 +88,10 @@ export default class ClienteInicio extends Component {
         } else {
             oDadosCliente = this.state;
         }
+        let estado = this.state;
+        estado.processandoRequisicao = false;
+        this.setState(estado);
+        
         oDadosCliente.emCadastro = true;
         navigation.navigate('ClienteDadosPessoais', oDadosCliente);
     }
@@ -95,7 +103,7 @@ export default class ClienteInicio extends Component {
         estado.email = '';
         this.setState(estado);
     }
-    botaoIniciar = () => <Button title="Iniciar" onPress={this.obterCliente} ></Button>
+    botaoIniciar = () => <Button title="Iniciar" onPress={this.obterCliente} loading={this.state.processandoRequisicao}></Button>;
 
     render() {
         let dadosCliente = this.state;
