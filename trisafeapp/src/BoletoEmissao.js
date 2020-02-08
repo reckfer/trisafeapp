@@ -1,0 +1,146 @@
+/**
+ * Componente de tela para dados de cliente
+ *
+ * @format
+ * @flow
+ */
+
+import React, { Component } from 'react';
+import {
+    ScrollView,
+    Alert,
+    View
+} from 'react-native';
+import Util from './common/Util';
+import { ThemeProvider, PricingCard } from 'react-native-elements';
+import Cabecalho from './common/CabecalhoTela';
+import { styles, theme } from './common/Estilos';
+import AreaBotoes from './common/AreaBotoes';
+
+export default class BoletoEmissao extends Component {
+    static navigationOptions = {
+        title: 'ProdutoOferta'
+    }
+    constructor(props) {
+        super(props);
+        
+        this.limpar = this.limpar.bind(this);
+        this.salvar = this.salvar.bind(this);
+        this.voltar = this.voltar.bind(this);
+        this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
+        this.capturarDadosFiltroCallBack = this.capturarDadosFiltroCallBack.bind(this);
+        
+        objUtil = new Util();
+        this.state = objUtil.inicializarDadosCliente();
+    }
+
+    tratarDadosRetorno(oDados, oEstado) {
+        let estado = this.state;
+
+        estado.processandoRequisicao = false;
+        this.setState(estado);
+
+        if (oEstado.mensagem && oEstado.mensagem.trim()) {
+            Alert.alert(oEstado.mensagem);
+        }
+        if(oDados && oDados.id_cliente_iter) {
+            Alert.alert("Cod. cliente Iter: " + oDados.id_cliente_iter);
+        }
+
+        const { navigation } = this.props;
+        
+        this.state.emCadastro = false;
+        navigation.navigate('ClienteEndereco', this.state);
+    }
+
+    contratar() {
+        try {
+            let url = objUtil.getURL('/produtos/contratar/');
+            let estado = this.state;
+            
+            estado.processandoRequisicao = true;
+            this.setState(estado);
+
+            fetch(url, {
+                    method: 'POST',
+                    headers: {
+                      Accept: 'application/json',
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(estado)
+                  })
+                  .then(objUtil.obterJsonResposta)
+                  .then((oJsonDados) => {
+                      objUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetorno, true);
+                  })
+        } catch (exc) {
+            Alert.alert(exc);
+        }
+    }
+
+    limpar() {
+        let estado = this.state;
+
+        estado.codigo = '';
+        estado.nomeCliente = '';
+        estado.nomeUsuario = '';
+        estado.cpf = '';
+        estado.rg = '';
+        estado.email = '';
+        this.setState(estado);
+    }
+
+    capturarDadosFiltroCallBack(oDadosFiltro) {
+        let estado = this.state;
+        
+        estado.codigo = oDadosFiltro.codigo;
+        this.setState(estado);
+    }
+    
+    voltar() {
+        const { navigation } = this.props;
+        
+        navigation.navigate('ClienteConfirmacao', this.state);
+    }
+
+    botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;        
+    botaoConfirmar = () => <Button title="Confirmar" onPress={this.salvar} loading={this.state.processandoRequisicao} ></Button>;
+
+    render() {
+        let dadosCliente = this.state;
+        const { navigation } = this.props;        
+
+        let botoesTela = [ { element: this.botaoVoltar }, { element: this.botaoConfirmar } ];
+
+        // Obtem os dados vindos da tela dados pessoais.
+        objUtil.lerDadosNavegacao(dadosCliente, navigation);
+        
+        return (
+            <View style={styles.areaCliente}>
+                <Cabecalho titulo='Produto' nomeTela='Contratação' />
+                <AreaDados parentCallBack={this.capturarDadosFiltroCallBack} dadosCliente={dadosCliente}/>
+                <AreaBotoes botoes={botoesTela} />
+            </View>
+        );
+    }
+}
+
+export class AreaDados extends Component {
+
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+
+        return (
+            <ScrollView>
+                <ThemeProvider theme={theme}>
+                    <View style={styles.areaDadosCliente}>
+                    
+                    </View>
+                </ThemeProvider>
+            </ScrollView>       
+        );
+    }
+}

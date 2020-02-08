@@ -10,9 +10,9 @@ export default class Util {
 
         if (__DEV__) {
             protocol = 'http://';
-            // domain = '10.0.0.104:8000';
-            //domain = '192.168.0.8:8000';
-            domain = '192.168.0.3:8000';
+            domain = '10.0.0.101:8000';
+            // domain = '192.168.0.105:8000';
+            // domain = '192.168.43.84:8000';
         }
         return protocol + domain + metodo;
     }
@@ -74,6 +74,14 @@ export default class Util {
             'bairro': '',
             'cep': '',
             'uf': '',
+            'contrato': {
+                'valorTotal': 0.00,
+                'listaProdutos': [],
+                'boleto': {
+                    'url_boleto_pdf': '',
+                    'url_boleto_html': '',
+                }
+            },
             'processandoRequisicao': false,
         };
     }
