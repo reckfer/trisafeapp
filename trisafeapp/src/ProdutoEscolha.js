@@ -130,24 +130,51 @@ export default class ProdutoEscolha extends Component {
                   .then((oJsonDados) => {
                       objUtil.tratarRetornoServidor(oJsonDados, this.tratarContratar, true);
                   })
+
+        //     const { navigation } = this.props;
+        // var estado = this.state;
+
+        // estado.processandoRequisicao = false;
+        // let contrato = {
+        //     'valorTotal': 0,
+        //     'listaProdutos': [],
+        //     'boleto': {
+        //         'url_boleto_pdf': '',
+        //         'url_boleto_html': '',
+        //     }
+        // }
+        // estado.contrato = contrato;
+        // estado.emCadastro = false;
+        
+        // this.setState(estado);
+        // navigation.navigate('BoletoEmissao', this.state);
         } catch (exc) {
             Alert.alert(exc);
         }
     }
 
     tratarContratar(oDados, oEstado) {
-        let estado = this.state;
-
-        estado.processandoRequisicao = false;
-        this.setState(estado);
-
+        
         if (oEstado.mensagem && oEstado.mensagem.trim()) {
             Alert.alert(oEstado.mensagem);
         }
 
         const { navigation } = this.props;
+        var estado = this.state;
+
+        estado.processandoRequisicao = false;
+        let contrato = {
+            'valorTotal': estado.contrato.valorTotal,
+            'listaProdutos': estado.contrato.listaProdutos,
+            'boleto': {
+                'url_boleto_pdf': oDados.url_boleto_pdf,
+                'url_boleto_html': oDados.url_boleto_html,
+            }
+        }
+        estado.contrato = contrato;
+        estado.emCadastro = false;
         
-        this.state.emCadastro = false;
+        this.setState(estado);
         navigation.navigate('BoletoEmissao', this.state);
     }
 

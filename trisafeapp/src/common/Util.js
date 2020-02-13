@@ -10,8 +10,8 @@ export default class Util {
 
         if (__DEV__) {
             protocol = 'http://';
-            domain = '10.0.0.101:8000';
-            // domain = '192.168.0.105:8000';
+            // domain = '10.0.0.103:8000';
+            domain = '192.168.0.3:8000';
             // domain = '192.168.43.84:8000';
         }
         return protocol + domain + metodo;

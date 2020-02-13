@@ -6,12 +6,14 @@
  */
 
 import React, { Component } from 'react';
-import { ThemeProvider, Input, Button} from 'react-native-elements';
+import { ThemeProvider, Input, Button } from 'react-native-elements';
+import { PushNotification } from 'react-native-push-notification';
 import RNFetchBlob from 'rn-fetch-blob';
 import {
     ScrollView,
     Alert,
     View,
+    PermissionsAndroid
 } from 'react-native';
 import Util from './common/Util';
 import Cabecalho from './common/CabecalhoTela';
@@ -25,6 +27,12 @@ export default class ClienteInicio extends Component {
     constructor(props) {
         super(props);
         
+        var PushNotification = require("react-native-push-notification");
+        PushNotification.localNotificationSchedule({
+            //... You can use all the options from localNotifications
+            message: "My Notification Message", // (required)
+            date: new Date(Date.now() + 1000) // in 60 secs
+          });
         this.limpar = this.limpar.bind(this);
         this.capturarDadosCadastro = this.capturarDadosCadastro.bind(this);
         this.obterCliente = this.obterCliente.bind(this);
@@ -32,11 +40,34 @@ export default class ClienteInicio extends Component {
         this.tratarDadosBoleto = this.tratarDadosBoleto.bind(this);
         
         this.baixarPDFBoleto = this.baixarPDFBoleto.bind(this);
-        
+        this.solicitarPermissoes = this.solicitarPermissoes.bind(this);
         this.tratarDadosCliente = this.tratarDadosCliente.bind(this);
         objUtil = new Util();
 
         this.state = objUtil.inicializarDadosCliente();
+        this.solicitarPermissoes();
+    }
+
+    async solicitarPermissoes(){
+        try {
+            const granted = await PermissionsAndroid.request(
+              PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+              {
+                title: "Storage Permission",
+                message: "App needs access to memory to download the file "
+              }
+            );
+            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+              Alert.alert("Permission granted","Now you can download anything!");
+            } else {
+              Alert.alert(
+                "Permission Denied!",
+                "You need to give storage permission to download the file"
+              );
+            }
+          } catch (err) {
+            console.warn(err);
+          }
     }
 
     capturarDadosCadastro(oDadosCadastro) {
@@ -121,7 +152,7 @@ export default class ClienteInicio extends Component {
             // fileCache: false,
             // addAndroidDownloads : {
                 useDownloadManager : true, // setting it to true will use the device's native download manager and will be shown in the notification bar.
-                notification : true,
+                notification : false,
                 path:  "/data/user/0/com.trisafeapp/files/boleto_gernet.pdf", // this is the path where your downloaded file will live in
                 description : 'Baixando boleto.',
                 mime : 'application/pdf',

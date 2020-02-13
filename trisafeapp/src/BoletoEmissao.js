@@ -12,20 +12,20 @@ import {
     View
 } from 'react-native';
 import Util from './common/Util';
-import { ThemeProvider, PricingCard } from 'react-native-elements';
+import { ThemeProvider, Button } from 'react-native-elements';
+import { WebView } from 'react-native-webview';
 import Cabecalho from './common/CabecalhoTela';
 import { styles, theme } from './common/Estilos';
 import AreaBotoes from './common/AreaBotoes';
 
 export default class BoletoEmissao extends Component {
     static navigationOptions = {
-        title: 'ProdutoOferta'
+        title: 'BoletoEmissao'
     }
     constructor(props) {
         super(props);
         
         this.limpar = this.limpar.bind(this);
-        this.salvar = this.salvar.bind(this);
         this.voltar = this.voltar.bind(this);
         this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
         this.capturarDadosFiltroCallBack = this.capturarDadosFiltroCallBack.bind(this);
@@ -104,21 +104,23 @@ export default class BoletoEmissao extends Component {
     }
 
     botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;        
-    botaoConfirmar = () => <Button title="Confirmar" onPress={this.salvar} loading={this.state.processandoRequisicao} ></Button>;
+    botaoConfirmar = () => <Button title="Confirmar" ></Button>;
 
     render() {
         let dadosCliente = this.state;
-        const { navigation } = this.props;        
+        const { navigation } = this.props;
 
         let botoesTela = [ { element: this.botaoVoltar }, { element: this.botaoConfirmar } ];
 
         // Obtem os dados vindos da tela dados pessoais.
-        objUtil.lerDadosNavegacao(dadosCliente, navigation);
+        // objUtil.lerDadosNavegacao(dadosCliente, navigation);
+        oContrato = navigation.getParam('contrato');
+        oBoleto = oContrato.boleto;
         
         return (
             <View style={styles.areaCliente}>
                 <Cabecalho titulo='Produto' nomeTela='Contratação' />
-                <AreaDados parentCallBack={this.capturarDadosFiltroCallBack} dadosCliente={dadosCliente}/>
+                <AreaDados dadosBoleto={oBoleto}/>
                 <AreaBotoes botoes={botoesTela} />
             </View>
         );
@@ -132,15 +134,11 @@ export class AreaDados extends Component {
     }
 
     render() {
+        
 
         return (
-            <ScrollView>
-                <ThemeProvider theme={theme}>
-                    <View style={styles.areaDadosCliente}>
-                    
-                    </View>
-                </ThemeProvider>
-            </ScrollView>       
+            <WebView source={{ uri: this.props.dadosBoleto.url_boleto_html }} />
+            // <WebView source={{ uri: 'https://github.com/facebook/react-native' }} />                
         );
     }
 }
