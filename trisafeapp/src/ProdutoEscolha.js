@@ -32,18 +32,25 @@ export default class ProdutoEscolha extends Component {
         this.tratarListarProdutos = this.tratarListarProdutos.bind(this);
         this.contratar = this.contratar.bind(this);
         this.tratarContratar = this.tratarContratar.bind(this);        
-        this.capturarDadosFiltroCallBack = this.capturarDadosFiltroCallBack.bind(this);
+        // this.capturarDadosFiltroCallBack = this.capturarDadosFiltroCallBack.bind(this);
         
         objUtil = new Util();
-        let estadoInicial = objUtil.inicializarDadosCliente();
-        this.state = estadoInicial;
+        
+        let dados = objUtil.inicializarDados();
+        const { navigation } = this.props;
+        
+        // Obtem os dados vindos da tela anterior.
+        let dadosCliente = dados.cliente;
+        objUtil.lerDadosNavegacao(dadosCliente, navigation);
+        dados.cliente = dadosCliente;
 
+        this.state = dados;
+        
         this.listarProdutos();
     }
 
     listarProdutos(){
         try {
-            let estado = this.state;            
             let url = objUtil.getURL('/produtos/listar/');
 
             fetch(url, {
@@ -78,10 +85,16 @@ export default class ProdutoEscolha extends Component {
         }
         console.log(oDados);
         if(oDados && Array.isArray(oDados)) {
+            let valorTotal = 0.00;
+            for(let i = 0; i < oDados.length; i++)  {
+            
+                oProduto = oDados[i];
+                valorTotal += Number.parseFloat(oProduto.valor);
+            }
             let estado = this.state;
             
             let oContrato = {
-                'valorTotal': 0.00,
+                'valorTotal': valorTotal,
                 'listaProdutos': oDados,
             }
             estado.contrato = oContrato;
@@ -181,39 +194,43 @@ export default class ProdutoEscolha extends Component {
     limpar() {
         let estado = this.state;
 
-        estado.codigo = '';
-        estado.nomeCliente = '';
-        estado.nomeUsuario = '';
-        estado.cpf = '';
-        estado.rg = '';
-        estado.email = '';
+        estado.cliente.nomeCliente = '';
+        estado.cliente.nomeUsuario = '';
+        estado.cliente.cpf = '';
+        estado.cliente.rg = '';
+        estado.cliente.email = '';
         this.setState(estado);
     }
 
-    capturarDadosFiltroCallBack(oDadosFiltro) {
-        let estado = this.state;
+    // capturarDadosFiltroCallBack(oDadosFiltro) {
+    //     let estado = this.state;
         
-        estado.codigo = oDadosFiltro.codigo;
-        this.setState(estado);
-    }
+    //     estado.codigo = oDadosFiltro.codigo;
+    //     this.setState(estado);
+    // }
     
     voltar() {
         const { navigation } = this.props;
-        
-        navigation.navigate('ClienteConfirmacao', this.state);
+        let telaDestino = 'ClienteConfirmacao';
+
+        if(navigation.getParam('emTestes')) {
+            telaDestino = 'TestesInicio';
+        }
+        navigation.navigate(telaDestino, this.state);
     }
 
     botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;        
     
     render() {
+        const { navigation } = this.props;
         let contrato = this.state.contrato;
-
+        
         let botoesTela = [ { element: this.botaoVoltar }];
         
         return (
             <View style={styles.areaCliente}>
                 <Cabecalho titulo='Produto' nomeTela='Contratação' />
-                <AreaDados parentCallBack={this.capturarDadosFiltroCallBack} contratar={this.contratar} contrato={contrato}/>
+                <AreaDados contratar={this.contratar} contrato={contrato}/>
                 <AreaBotoes botoes={botoesTela} />
             </View>
         );
@@ -232,19 +249,18 @@ export class AreaDados extends Component {
         let oCard;
         let oProduto;
         let produtoFormatado;
-        let valorTotal = 0.00;
+        let valorTotal = this.props.contrato.valorTotal;
 
         for(let i = 0; i < listaProdutos.length; i++)  {
             
             oProduto = listaProdutos[i];
-            valorTotal += Number.parseFloat(oProduto.valor);
             produtoFormatado = oProduto.nome + ' = R$ ' + oProduto.valor;
             
             oCard = <CardContent text={produtoFormatado} key={oProduto.codigo} />;
             listaProdutosCartao.push(oCard);
         }
         botaoVoltar = () => <Button title="Contratar" onPress={this.voltar} ></Button>;
-        let botoesCard = [ { element: this.botaoVoltar }];
+        // let botoesCard = [ { element: this.botaoVoltar }];
 
         // oCard = <CardContent text={produtoFormatado} key={oProduto.codigo} />;
 

@@ -14,6 +14,7 @@ import ClienteEndereco from './src/ClienteEndereco';
 import ClienteConfirmacao from './src/ClienteConfirmacao';
 import ProdutoEscolha from './src/ProdutoEscolha';
 import BoletoEmissao from './src/BoletoEmissao';
+import TestesInicio from './src/tests/TestesInicio';
 
 const AppNavigator = createDrawerNavigator({
     ClienteInicio: {
@@ -33,7 +34,11 @@ const AppNavigator = createDrawerNavigator({
     },
     ClienteConfirmacao: {
       screen: ClienteConfirmacao,
-    }
+    },
+    // Telas de testes rapidos    
+    TestesInicio: {
+      screen: TestesInicio,
+    }    
   },
   {
     initialRouteName: 'ClienteInicio'

@@ -30,7 +30,7 @@ export default class ClienteDadosPessoais extends Component {
         this.capturarDadosCadastro = this.capturarDadosCadastro.bind(this);
         
         objUtil = new Util();
-        this.state = objUtil.inicializarDadosCliente();
+        this.state = objUtil.inicializarDados();
     }
 
     tratarRetornoJson(oJsonResposta) {
@@ -48,12 +48,12 @@ export default class ClienteDadosPessoais extends Component {
         if(oJsonDados && oJsonDados.dados) {
             let estado = this.state;
 
-            estado.codigo = oJsonDados.dados.id.toString();
-            estado.nomeCliente = oJsonDados.dados.name;            
-            estado.nomeUsuario = oJsonDados.dados.dadosName;
-            estado.cpf = oJsonDados.dados.document;
-            estado.email = oJsonDados.dados.email;
-            estado.telefone = oJsonDados.dados.telefone;
+            estado.cliente.codigo = oJsonDados.dados.id.toString();
+            estado.cliente.nomeCliente = oJsonDados.dados.name;            
+            estado.cliente.nomeUsuario = oJsonDados.dados.dadosName;
+            estado.cliente.cpf = oJsonDados.dados.document;
+            estado.cliente.email = oJsonDados.dados.email;
+            estado.cliente.telefone = oJsonDados.dados.telefone;
             
             this.setState(estado);
         } else if (oJsonDados.mensagem && oJsonDados.mensagem.trim()){
@@ -66,13 +66,13 @@ export default class ClienteDadosPessoais extends Component {
     limpar() {
         let estado = this.state;
 
-        estado.codigo = '';
-        estado.nomeCliente = '';
-        estado.nomeUsuario = '';
-        estado.cpf = '';
-        estado.rg = '';
-        estado.email = '';
-        estado.telefone = '';
+        estado.cliente.codigo = '';
+        estado.cliente.nomeCliente = '';
+        estado.cliente.nomeUsuario = '';
+        estado.cliente.cpf = '';
+        estado.cliente.rg = '';
+        estado.cliente.email = '';
+        estado.cliente.telefone = '';
         this.setState(estado);
     }
 
@@ -94,26 +94,26 @@ export default class ClienteDadosPessoais extends Component {
     capturarDadosCadastro(oDadosCadastro) {
         let estado = this.state;
     
-        estado.cpf = oDadosCadastro.cpf;
-        estado.rg = oDadosCadastro.rg;
-        estado.nome = oDadosCadastro.nome;
-        estado.nomeUsuario = oDadosCadastro.nomeUsuario;
-        estado.email = oDadosCadastro.email;
-        estado.telefone = oDadosCadastro.telefone;
+        estado.cliente.cpf = oDadosCadastro.cpf;
+        estado.cliente.rg = oDadosCadastro.rg;
+        estado.cliente.nome = oDadosCadastro.nome;
+        estado.cliente.nomeUsuario = oDadosCadastro.nomeUsuario;
+        estado.cliente.email = oDadosCadastro.email;
+        estado.cliente.telefone = oDadosCadastro.telefone;
         estado.emCadastro = true;
         
         this.setState(estado);
     }
 
     render() {
-        let dadosCliente = this.state;
+        let dadosCliente = this.state.cliente;
         const { navigation } = this.props;        
         let botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>
         let botaoAvancar = () => <Button title="Avançar" onPress={this.confirmar} ></Button>
         
         let botoesTela = [ { element: botaoVoltar }, { element: botaoAvancar } ];
 
-        if(!dadosCliente.emCadastro) {
+        if(!this.state.emCadastro) {
             // Obtem os dados vindos da primeira tela.
             objUtil.lerDadosNavegacao(dadosCliente, navigation);
         }

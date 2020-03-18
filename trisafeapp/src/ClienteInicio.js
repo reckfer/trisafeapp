@@ -27,54 +27,56 @@ export default class ClienteInicio extends Component {
     constructor(props) {
         super(props);
         
-        var PushNotification = require("react-native-push-notification");
-        PushNotification.localNotificationSchedule({
-            //... You can use all the options from localNotifications
-            message: "My Notification Message", // (required)
-            date: new Date(Date.now() + 1000) // in 60 secs
-          });
+        // var PushNotification = require("react-native-push-notification");
+        // PushNotification.localNotificationSchedule({
+        //     //... You can use all the options from localNotifications
+        //     message: "My Notification Message", // (required)
+        //     date: new Date(Date.now() + 1000) // in 60 secs
+        //   });
         this.limpar = this.limpar.bind(this);
         this.capturarDadosCadastro = this.capturarDadosCadastro.bind(this);
         this.obterCliente = this.obterCliente.bind(this);
-        this.gerarBoleto = this.gerarBoleto.bind(this);
-        this.tratarDadosBoleto = this.tratarDadosBoleto.bind(this);
         
-        this.baixarPDFBoleto = this.baixarPDFBoleto.bind(this);
-        this.solicitarPermissoes = this.solicitarPermissoes.bind(this);
+        // this.baixarPDFBoleto = this.baixarPDFBoleto.bind(this);
+        // this.gerarBoleto = this.gerarBoleto.bind(this);        
+        // this.tratarDadosBoleto = this.tratarDadosBoleto.bind(this);
+        
+        this.irParaTestesRapidos = this.irParaTestesRapidos.bind(this);
+        // this.solicitarPermissoes = this.solicitarPermissoes.bind(this);
         this.tratarDadosCliente = this.tratarDadosCliente.bind(this);
         objUtil = new Util();
 
-        this.state = objUtil.inicializarDadosCliente();
-        this.solicitarPermissoes();
+        this.state = objUtil.inicializarDados();
+       // this.solicitarPermissoes();
     }
 
-    async solicitarPermissoes(){
-        try {
-            const granted = await PermissionsAndroid.request(
-              PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-              {
-                title: "Storage Permission",
-                message: "App needs access to memory to download the file "
-              }
-            );
-            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-              Alert.alert("Permission granted","Now you can download anything!");
-            } else {
-              Alert.alert(
-                "Permission Denied!",
-                "You need to give storage permission to download the file"
-              );
-            }
-          } catch (err) {
-            console.warn(err);
-          }
-    }
+    // async solicitarPermissoes(){
+    //     try {
+    //         const granted = await PermissionsAndroid.request(
+    //           PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+    //           {
+    //             title: "Storage Permission",
+    //             message: "App needs access to memory to download the file "
+    //           }
+    //         );
+    //         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+    //           Alert.alert("Permission granted","Now you can download anything!");
+    //         } else {
+    //           Alert.alert(
+    //             "Permission Denied!",
+    //             "You need to give storage permission to download the file"
+    //           );
+    //         }
+    //       } catch (err) {
+    //         console.warn(err);
+    //       }
+    // }
 
     capturarDadosCadastro(oDadosCadastro) {
         let estado = this.state;
 
-        estado.cpf = oDadosCadastro.cpf;
-        estado.email = oDadosCadastro.email;
+        estado.cliente.cpf = oDadosCadastro.cpf;
+        estado.cliente.email = oDadosCadastro.email;
 
         this.setState(estado);
     }
@@ -93,10 +95,7 @@ export default class ClienteInicio extends Component {
                   Accept: 'application/json',
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                  cpf: estado.cpf,
-                  email: estado.email
-                }),
+                body: JSON.stringify(estado),
               })
                 .then(objUtil.obterJsonResposta)
                 .then((oJsonDados) => {
@@ -112,68 +111,9 @@ export default class ClienteInicio extends Component {
         }
     }
 
-    gerarBoleto() {
-        try {
-            let estado = this.state;            
-            let url = objUtil.getURL('/boletos/gerarBoleto/');
-
-            estado.processandoRequisicao = true;
-            this.setState(estado);
-
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                  Accept: 'application/json',
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                }),
-              })
-                .then(objUtil.obterJsonResposta)
-                .then((oJsonDados) => {
-                    objUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosBoleto, true);
-                })
-                .catch(function (erro) {
-                    Alert.alert(erro.message);
-                    throw erro;
-                });
-        } catch (exc) {
-            Alert.alert(exc.message);
-            throw exc;
-        }
-    }
-
-    baixarPDFBoleto(){
-        let url = 'https://download.gerencianet.com.br/229576_14_FORAA5/229576-637436-ZENEM8.pdf?sandbox=true';
-        // Documentacao: https://github.com/joltup/rn-fetch-blob/wiki/Manually-Link-Package#index
-        const { config, fs } = RNFetchBlob;
-        let docDir = fs.dirs.DocumentDir; // this is the pictures directory. You can check the available directories in the wiki.
-        let options = {
-            // fileCache: false,
-            // addAndroidDownloads : {
-                useDownloadManager : true, // setting it to true will use the device's native download manager and will be shown in the notification bar.
-                notification : false,
-                path:  "/data/user/0/com.trisafeapp/files/boleto_gernet.pdf", // this is the path where your downloaded file will live in
-                description : 'Baixando boleto.',
-                mime : 'application/pdf',
-            // }
-        }
-        config(options).fetch('GET', url).then((res) => {
-            if(res) {
-                console.log('resp of pdf', res);
-                console.log('The file saved to ', res.path());
-                Alert.alert(res.path());
-            } else {
-                Alert.alert('res vazio');
-            }
-        }).catch((err) => {
-            console.log(err);
-        });
-    }
-
     tratarDadosCliente(oDados, oEstado) {
         const { navigation } = this.props;
-        let oDadosCliente;
+        let estado = this.state;
 
         if(oEstado.cod_mensagem === 'NaoCadastrado') {
             Alert.alert('Seu cadastro não foi localizado. Preencha os dados solicitados para realizá-lo.');
@@ -181,17 +121,13 @@ export default class ClienteInicio extends Component {
             Alert.alert(oEstado.mensagem);
         }
         if(oDados) {
-            oDadosCliente = oDados;
-        } else {
-            oDadosCliente = this.state;
+            estado.cliente = oDados;
         }
-        let estado = this.state;
+
         estado.processandoRequisicao = false;
-        this.setState(estado);
-        
-        oDadosCliente.emCadastro = true;
-        // navigation.navigate('ClienteDadosPessoais', oDadosCliente);
-        navigation.navigate('ProdutoEscolha', oDadosCliente);
+        estado.emCadastro = true;
+
+        navigation.navigate('ClienteDadosPessoais', estado);
     }
 
     tratarDadosBoleto(oDados, oEstado) {
@@ -206,6 +142,12 @@ export default class ClienteInicio extends Component {
         }
     }
 
+    irParaTestesRapidos(){
+        const { navigation } = this.props;
+        
+        navigation.navigate('TestesInicio');
+    }
+
     limpar() {
         let estado = this.state;
 
@@ -214,12 +156,11 @@ export default class ClienteInicio extends Component {
         this.setState(estado);
     }
     botaoIniciar = () => <Button title="Iniciar" onPress={this.obterCliente} loading={this.state.processandoRequisicao}></Button>;
-    botaoGerarBoleto = () => <Button title="Gerar Boleto" onPress={this.baixarPDFBoleto} loading={this.state.processandoRequisicao}></Button>;
-    botaoListarProdutos = () => <Button title="Produtos" onPress={this.listarProdutos} loading={this.state.processandoRequisicao}></Button>;
+    botaoTestesRapidos = () => <Button title="Testes Rápidos" onPress={this.irParaTestesRapidos} ></Button>;
 
     render() {
         let dadosCliente = this.state;
-        let botoesTela = [ { element: this.botaoIniciar }, { element: this.botaoGerarBoleto }, { element: this.botaoListarProdutos } ];
+        let botoesTela = [ { element: this.botaoIniciar }, { element: this.botaoTestesRapidos} ];
         
         return (
             <View style={styles.areaCliente}>
@@ -251,3 +192,70 @@ export class AreaDados extends Component {
         );
     }
 }
+
+
+
+
+
+
+
+
+
+// gerarBoleto() {
+//     try {
+//         let estado = this.state;            
+//         let url = objUtil.getURL('/boletos/gerarBoleto/');
+
+//         estado.processandoRequisicao = true;
+//         this.setState(estado);
+
+//         fetch(url, {
+//             method: 'POST',
+//             headers: {
+//               Accept: 'application/json',
+//               'Content-Type': 'application/json',
+//             },
+//             body: JSON.stringify({
+//             }),
+//           })
+//             .then(objUtil.obterJsonResposta)
+//             .then((oJsonDados) => {
+//                 objUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosBoleto, true);
+//             })
+//             .catch(function (erro) {
+//                 Alert.alert(erro.message);
+//                 throw erro;
+//             });
+//     } catch (exc) {
+//         Alert.alert(exc.message);
+//         throw exc;
+//     }
+// }
+
+// baixarPDFBoleto(){
+//     let url = 'https://download.gerencianet.com.br/229576_14_FORAA5/229576-637436-ZENEM8.pdf?sandbox=true';
+//     // Documentacao: https://github.com/joltup/rn-fetch-blob/wiki/Manually-Link-Package#index
+//     const { config, fs } = RNFetchBlob;
+//     let docDir = fs.dirs.DocumentDir; // this is the pictures directory. You can check the available directories in the wiki.
+//     let options = {
+//         // fileCache: false,
+//         // addAndroidDownloads : {
+//             useDownloadManager : true, // setting it to true will use the device's native download manager and will be shown in the notification bar.
+//             notification : false,
+//             path:  "/data/user/0/com.trisafeapp/files/boleto_gernet.pdf", // this is the path where your downloaded file will live in
+//             description : 'Baixando boleto.',
+//             mime : 'application/pdf',
+//         // }
+//     }
+//     config(options).fetch('GET', url).then((res) => {
+//         if(res) {
+//             console.log('resp of pdf', res);
+//             console.log('The file saved to ', res.path());
+//             Alert.alert(res.path());
+//         } else {
+//             Alert.alert('res vazio');
+//         }
+//     }).catch((err) => {
+//         console.log(err);
+//     });
+// }

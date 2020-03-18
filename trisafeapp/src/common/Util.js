@@ -3,6 +3,11 @@ import {
 } from 'react-native';
 
 export default class Util {
+
+    constructor(){
+        this.inicializarDadosCliente = this.inicializarDadosCliente.bind(this);
+        this.inicializarDadosContrato = this.inicializarDadosContrato.bind(this);
+    }
     
     getURL(metodo){
         protocol = 'https://';
@@ -10,9 +15,7 @@ export default class Util {
 
         if (__DEV__) {
             protocol = 'http://';
-            // domain = '10.0.0.103:8000';
-            domain = '192.168.0.3:8000';
-            // domain = '192.168.43.84:8000';
+            domain = '192.168.0.2:8000';
         }
         return protocol + domain + metodo;
     }
@@ -49,13 +52,41 @@ export default class Util {
         }
     }
 
-    lerDadosNavegacao(dadosCliente, navigation) {
+    lerDadosNavegacao(dados, navigation) {
         let valor;
-        for(chave in dadosCliente) {
-            valor = navigation.getParam(chave);
-            if(typeof(valor) === 'string' && valor.trim()) {
-                dadosCliente[chave] = valor;
+
+        if(dados) {
+            let dadosCliente;
+            let dadosContrato;
+
+            dadosCliente = navigation.getParam('cliente');
+            dadosContrato = navigation.getParam('contrato');
+            
+            if(dadosCliente) {
+                for(chave in dadosCliente) {
+                    valor = dadosCliente[chave];
+                    if(typeof(valor) === 'string' && valor.trim()) {
+                        dados[chave] = valor;
+                    }                
+                }
             }
+            if(dadosContrato) {
+                for(chave in dadosContrato) {
+                    valor = dadosContrato[chave];
+                    if(typeof(valor) === 'string' && valor.trim()) {
+                        dados[chave] = valor;
+                    }                
+                }
+            }
+        }
+    }
+
+    inicializarDados() {
+        return {
+            'cliente': this.inicializarDadosCliente(),
+            'contrato': this.inicializarDadosContrato(),
+            'processandoRequisicao': false,
+            'emCadastro': false,
         }
     }
 
@@ -74,15 +105,17 @@ export default class Util {
             'bairro': '',
             'cep': '',
             'uf': '',
-            'contrato': {
-                'valorTotal': 0.00,
-                'listaProdutos': [],
-                'boleto': {
-                    'url_boleto_pdf': '',
-                    'url_boleto_html': '',
-                }
-            },
-            'processandoRequisicao': false,
+        };
+    }
+
+    inicializarDadosContrato() {
+        return {
+            'valorTotal': 0.00,
+            'listaProdutos': [],
+            'boleto': {
+                'url_boleto_pdf': '',
+                'url_boleto_html': '',
+            }
         };
     }
 }

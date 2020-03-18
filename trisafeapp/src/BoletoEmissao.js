@@ -31,7 +31,7 @@ export default class BoletoEmissao extends Component {
         this.capturarDadosFiltroCallBack = this.capturarDadosFiltroCallBack.bind(this);
         
         objUtil = new Util();
-        this.state = objUtil.inicializarDadosCliente();
+        this.state = objUtil.inicializarDados();
     }
 
     tratarDadosRetorno(oDados, oEstado) {

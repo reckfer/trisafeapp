@@ -30,7 +30,7 @@ export default class ClienteEndereco extends Component {
         this.capturarDadosCadastro = this.capturarDadosCadastro.bind(this);
         
         objUtil = new Util();
-        this.state = objUtil.inicializarDadosCliente();
+        this.state = objUtil.inicializarDados();
     }
 
     tratarRetornoJson(oJsonResposta) {
@@ -48,13 +48,13 @@ export default class ClienteEndereco extends Component {
         if(oJsonDados && oJsonDados.dados) {
             let estado = this.state;
 
-            estado.cidade = oJsonDados.dados.cidade;
-            estado.rua = oJsonDados.dados.rua;            
-            estado.numero = oJsonDados.dados.numero;
-            estado.complemento = oJsonDados.dados.complemento;
-            estado.bairro = oJsonDados.dados.bairro;
-            estado.uf = oJsonDados.dados.uf;
-            estado.cep = oJsonDados.dados.cep;
+            estado.cliente.cidade = oJsonDados.dados.cidade;
+            estado.cliente.rua = oJsonDados.dados.rua;            
+            estado.cliente.numero = oJsonDados.dados.numero;
+            estado.cliente.complemento = oJsonDados.dados.complemento;
+            estado.cliente.bairro = oJsonDados.dados.bairro;
+            estado.cliente.uf = oJsonDados.dados.uf;
+            estado.cliente.cep = oJsonDados.dados.cep;
             
             this.setState(estado);
         } else if (oJsonDados.mensagem && oJsonDados.mensagem.trim()){
@@ -67,13 +67,13 @@ export default class ClienteEndereco extends Component {
     limpar() {
         let estado = this.state;
 
-        estado.cidade = '';
-        estado.rua = '';
-        estado.numero = '';
-        estado.complemento = '';
-        estado.bairro = '';
-        estado.cep = '';
-        estado.uf = '';
+        estado.cliente.cidade = '';
+        estado.cliente.rua = '';
+        estado.cliente.numero = '';
+        estado.cliente.complemento = '';
+        estado.cliente.bairro = '';
+        estado.cliente.cep = '';
+        estado.cliente.uf = '';
         this.setState(estado);
     }
 
@@ -89,13 +89,13 @@ export default class ClienteEndereco extends Component {
     capturarDadosCadastro(oDadosCadastro) {
         let estado = this.state;
     
-        estado.cidade = oDadosCadastro.cidade;
-        estado.rua = oDadosCadastro.rua;
-        estado.numero = oDadosCadastro.numero;
-        estado.complemento = oDadosCadastro.complemento;
-        estado.bairro = oDadosCadastro.bairro;
-        estado.cep = oDadosCadastro.cep;
-        estado.uf = oDadosCadastro.uf;
+        estado.cliente.cidade = oDadosCadastro.cidade;
+        estado.cliente.rua = oDadosCadastro.rua;
+        estado.cliente.numero = oDadosCadastro.numero;
+        estado.cliente.complemento = oDadosCadastro.complemento;
+        estado.cliente.bairro = oDadosCadastro.bairro;
+        estado.cliente.cep = oDadosCadastro.cep;
+        estado.cliente.uf = oDadosCadastro.uf;
         estado.emCadastro = true;
 
         this.setState(estado);
@@ -108,14 +108,14 @@ export default class ClienteEndereco extends Component {
     }
 
     render() {
-        let dadosCliente = this.state;
+        let dadosCliente = this.state.cliente;
         const { navigation } = this.props;
         let botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>
         let botaoAvancar = () => <Button title="Avançar" onPress={this.confirmar} ></Button>
         
         let botoesTela = [ { element: botaoVoltar }, { element: botaoAvancar } ];
         
-        if(!dadosCliente.emCadastro) {
+        if(!this.state.emCadastro) {
             // Obtem os dados vindos da tela dados pessoais.
             objUtil.lerDadosNavegacao(dadosCliente, navigation);
         }

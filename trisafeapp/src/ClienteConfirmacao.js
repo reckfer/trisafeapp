@@ -31,7 +31,7 @@ export default class ClienteConfirmacao extends Component {
         this.capturarDadosFiltroCallBack = this.capturarDadosFiltroCallBack.bind(this);
         
         objUtil = new Util();
-        this.state = objUtil.inicializarDadosCliente();
+        this.state = objUtil.inicializarDados();
     }
 
     tratarDadosRetorno(oDados, oEstado) {
@@ -76,34 +76,38 @@ export default class ClienteConfirmacao extends Component {
     limpar() {
         let estado = this.state;
 
-        estado.codigo = '';
-        estado.nomeCliente = '';
-        estado.nomeUsuario = '';
-        estado.cpf = '';
-        estado.rg = '';
-        estado.email = '';
+        estado.cliente.codigo = '';
+        estado.cliente.nomeCliente = '';
+        estado.cliente.nomeUsuario = '';
+        estado.cliente.cpf = '';
+        estado.cliente.rg = '';
+        estado.cliente.email = '';
         this.setState(estado);
     }
 
     capturarDadosFiltroCallBack(oDadosFiltro) {
         let estado = this.state;
         
-        estado.codigo = oDadosFiltro.codigo;
+        estado.cliente.codigo = oDadosFiltro.codigo;
         this.setState(estado);
     }
      
     voltar() {
         const { navigation } = this.props;
-        
-        navigation.navigate('ClienteEndereco', this.state);
+        let telaDestino = 'ClienteEndereco';
+
+        if(navigation.getParam('emTestes')) {
+            telaDestino = 'TestesInicio';
+        }
+        navigation.navigate(telaDestino, this.state);
     }
 
     botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;        
     botaoConfirmar = () => <Button title="Confirmar" onPress={this.salvar} loading={this.state.processandoRequisicao} ></Button>;
 
     render() {
-        let dadosCliente = this.state;
-        const { navigation } = this.props;        
+        let dadosCliente = this.state.cliente;
+        const { navigation } = this.props;
 
         let botoesTela = [ { element: this.botaoVoltar }, { element: this.botaoConfirmar } ];
 
