@@ -26,7 +26,6 @@ export default class ClienteDadosPessoais extends Component {
         this.limpar = this.limpar.bind(this);
         this.voltar = this.voltar.bind(this);
         this.confirmar = this.confirmar.bind(this);
-        this.atribuirDadosCliente = this.atribuirDadosCliente.bind(this);
         this.capturarDadosCadastro = this.capturarDadosCadastro.bind(this);
         
         objUtil = new Util();
@@ -41,26 +40,6 @@ export default class ClienteDadosPessoais extends Component {
             return null;
         }
         return oJsonResposta;
-    }
-
-    atribuirDadosCliente(oJsonDados) {
-        this.limpar();
-        if(oJsonDados && oJsonDados.dados) {
-            let estado = this.state;
-
-            estado.cliente.codigo = oJsonDados.dados.id.toString();
-            estado.cliente.nomeCliente = oJsonDados.dados.name;            
-            estado.cliente.nomeUsuario = oJsonDados.dados.dadosName;
-            estado.cliente.cpf = oJsonDados.dados.document;
-            estado.cliente.email = oJsonDados.dados.email;
-            estado.cliente.telefone = oJsonDados.dados.telefone;
-            
-            this.setState(estado);
-        } else if (oJsonDados.mensagem && oJsonDados.mensagem.trim()){
-            Alert.alert(oJsonDados.mensagem);
-        } else {
-            Alert.alert('Cadastrado não localizado.');
-        }
     }
 
     limpar() {

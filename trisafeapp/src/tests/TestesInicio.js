@@ -62,7 +62,7 @@ export default class TestesInicio extends Component {
 
     obterUltimoCliente() {
         try {
-            let url = objUtil.getURL('/clientes/obterUltimo/');
+            let url = objUtil.getURL('/clientes/obter_ultimo/');
            
             fetch(url, {
                     method: 'POST',
@@ -74,22 +74,19 @@ export default class TestesInicio extends Component {
                   })
                   .then(objUtil.obterJsonResposta)
                   .then((oJsonDados) => {
-                      objUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetorno, true);
+                      objUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetorno);
                   })
         } catch (exc) {
             Alert.alert(exc);
         }
     }
 
-    tratarDadosRetorno(oDados, oEstado) {
+    tratarDadosRetorno(oDados) {
         let estado = this.state;
 
         estado.processandoRequisicao = false;
         this.setState(estado);
 
-        if (oEstado.mensagem && oEstado.mensagem.trim()) {
-            Alert.alert(oEstado.mensagem);
-        }
         if(oDados) {
             estado.cliente.nome = oDados.nome;
             estado.cliente.cpf = oDados.cpf;

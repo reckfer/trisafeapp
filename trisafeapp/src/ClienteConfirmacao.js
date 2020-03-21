@@ -34,20 +34,6 @@ export default class ClienteConfirmacao extends Component {
         this.state = objUtil.inicializarDados();
     }
 
-    tratarDadosRetorno(oDados, oEstado) {
-        let estado = this.state;
-
-        estado.processandoRequisicao = false;
-        this.setState(estado);
-
-        if (oEstado.mensagem && oEstado.mensagem.trim()) {
-            Alert.alert(oEstado.mensagem);
-        }
-        if(oDados && oDados.id_cliente_iter) {
-            Alert.alert("Cod. cliente Iter: " + oDados.id_cliente_iter);
-        }
-    }
-
     salvar() {
         try {
             let url = objUtil.getURL('/clientes/incluir/');
@@ -66,10 +52,21 @@ export default class ClienteConfirmacao extends Component {
                   })
                   .then(objUtil.obterJsonResposta)
                   .then((oJsonDados) => {
-                      objUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetorno, true);
+                      objUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetorno);
                   })
         } catch (exc) {
             Alert.alert(exc);
+        }
+    }
+
+    tratarDadosRetorno(oDados) {
+        let estado = this.state;
+
+        estado.processandoRequisicao = false;
+        this.setState(estado);
+
+        if(oDados && oDados.id_cliente_iter) {
+            Alert.alert("Cod. cliente Iter: " + oDados.id_cliente_iter);
         }
     }
 
