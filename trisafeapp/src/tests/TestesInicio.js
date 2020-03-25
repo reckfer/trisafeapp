@@ -31,20 +31,32 @@ export default class TestesInicio extends Component {
         this.gerarDadosTestes = this.gerarDadosTestes.bind(this);
         this.obterUltimoCliente = this.obterUltimoCliente.bind(this);
         this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
+        this.inicializarDadosTela = this.inicializarDadosTela.bind(this);
 
         objUtilTests = new UtilTests();
         objUtil = new Util();
 
-        this.state = objUtil.inicializarDados();
-        this.obterUltimoCliente();
+        const { navigation } = this.props;
+        
+        this.inicializarDadosTela(navigation);
+    }
+
+    inicializarDadosTela(oNavigation) {
+
+        let oDados = objUtil.inicializarDados(oNavigation);
+        this.state = oDados;
+
+        if(!objUtil.temDados(oDados)) {
+            this.obterUltimoCliente();
+        }
     }
 
     irParaTesteCadastroIter() {
         const { navigation } = this.props;
         
-        // this.gerarDadosTestes();
+        let oDados = this.gerarDadosTestes();
 
-        navigation.navigate('ClienteConfirmacao', this.state);
+        navigation.navigate('ClienteInicio', oDados);
     }
 
     irParaTesteBoletoGerenciaNet() {
@@ -82,52 +94,56 @@ export default class TestesInicio extends Component {
     }
 
     tratarDadosRetorno(oDados) {
-        let estado = this.state;
+        let oDadosAppGeral = this.state;
 
-        estado.processandoRequisicao = false;
-        this.setState(estado);
-
-        if(oDados) {
-            estado.cliente.nome = oDados.nome;
-            estado.cliente.cpf = oDados.cpf;
-            estado.cliente.email = oDados.email;
-            estado.cliente.nomeUsuario = oDados.usuario;
-            estado.cliente.telefone = oDados.email;
-            estado.cliente.rua = oDados.rua;
-
-            this.setState(estado);
+        if(!oDados) {
+            oDados = this.gerarDadosTestes();
         }
+
+        oDadosAppGeral.cliente.nome = oDados.nome;
+        oDadosAppGeral.cliente.cpf = oDados.cpf;
+        oDadosAppGeral.cliente.email = oDados.email;
+        oDadosAppGeral.cliente.nomeUsuario = oDados.usuario;
+        oDadosAppGeral.cliente.telefone = oDados.email;
+        oDadosAppGeral.cliente.rua = oDados.rua;
+
+        this.setState(oDadosAppGeral);
     }
 
     gerarDadosTestes() {
+        let oDadosAppGeral = objUtil.inicializarDados();
+        let oDadosApp = oDadosAppGeral.dadosApp;
+        let oDadosCliente = oDadosApp.cliente;
+        let oDadosContrato = oDadosApp.contrato;
+
         let numAleatorio = Math.random();
-        let usuario = numAleatorio.toString(36).slice(6);        
-        let oEstado = this.state;
+        let usuario = numAleatorio.toString(36).slice(6);
 
-        oEstado.cliente.nome = 'Fernando Reck ' + usuario;
-        oEstado.cliente.cpf = objUtilTests.gerarCPF();
-        oEstado.cliente.email = usuario + '@emailtestes.com.br';
-        oEstado.cliente.nomeUsuario = usuario;
-        oEstado.cliente.telefone = '51' + numAleatorio.toString().slice(9);
-        oEstado.cliente.rua = 'Rua do Relógio';
-        oEstado.cliente.numero = numAleatorio.toString().slice(15);
-        oEstado.cliente.cidade = 'Porto Alegre';
-        oEstado.cliente.uf = 'RS';
-        oEstado.cliente.complemento = 'Ap. 4' + numAleatorio.toString(16);
-        oEstado.cliente.bairro = 'Bela Vista';
-        oEstado.cliente.cep = numAleatorio.toString().slice(10);
-        oEstado.contrato.valorTotal = Math.floor(Math.random() * 100) + 1;
-        oEstado.contrato.listaProdutos = [1, 2, 3];
-        oEstado.contrato.boleto.url_boleto_pdf = '';
-        oEstado.contrato.boleto.url_boleto_html = '';
-        oEstado.emTestes = true;
+        oDadosCliente.nome = 'Fernando Reck ' + usuario;
+        oDadosCliente.cpf = objUtilTests.gerarCPF();
+        oDadosCliente.email = usuario + '@emailtestes.com.br';
+        oDadosCliente.nomeUsuario = usuario;
+        oDadosCliente.telefone = '51' + numAleatorio.toString().slice(9);
+        oDadosCliente.rua = 'Rua do Relógio';
+        oDadosCliente.numero = numAleatorio.toString().slice(15);
+        oDadosCliente.cidade = 'Porto Alegre';
+        oDadosCliente.uf = 'RS';
+        oDadosCliente.complemento = 'Ap. 4' + numAleatorio.toString(16);
+        oDadosCliente.bairro = 'Bela Vista';
+        oDadosCliente.cep = numAleatorio.toString().slice(10);
+        oDadosContrato.valorTotal = Math.floor(Math.random() * 100) + 1;
+        oDadosContrato.listaProdutos = [1, 2, 3];
+        oDadosContrato.boleto.url_boleto_pdf = '';
+        oDadosContrato.boleto.url_boleto_html = '';
+        oDadosApp.emTestes = true;
 
-        this.setState(oEstado);
+        return oDadosAppGeral;
     }
 
     botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;
     
     render() {
+        let dadosApp = this.state.dadosApp;
         let botoesTela = [ 
             { element: this.botaoVoltar }, 
         ];
@@ -140,36 +156,51 @@ export default class TestesInicio extends Component {
         return (
             <View style={styles.areaCliente}>
                 <Cabecalho titulo='Testes' nomeTela='Início' />
-                <AreaGrid funcoes={funcoes} estado={this.state} />
+                <AreaDados dadosApp={dadosApp} funcoes={funcoes} />
                 <AreaBotoes botoes={botoesTela} />
             </View>
         );
     }
 }
 
-export class AreaGrid extends Component {
+// TestesInicio.navigationOptions = ({navigation, route}) => {
+//     return {
+//         headerTitle: '',        
+//         headerRight: () => {},
+//     }
+// };
+
+export class AreaDados extends Component {
 
     constructor(props) {
         super(props);
     }
 
+    atualizarDados(oDadosCliente) {
+        let oDadosNavegacao = this.props.dadosApp;
+        oDadosNavegacao.cliente = oDadosCliente;
+        
+        this.setState(oDadosNavegacao);
+    }
+
     render() {
-        let estado = this.props.estado;
-        let cliente = this.props.estado.cliente;
+        let oDadosCliente = this.props.dadosApp.cliente;
+        let oFuncoes = this.props.funcoes;
+
         return (
             <ScrollView>
                 <View style={{flex: 1, flexDirection: 'column', }}>
                     <View style={{flex: 1, flexDirection: 'row', alignItems: 'stretch', justifyContent: 'center' }}>
                         <View style={{height:50}} >
-                            <Button title="Cadastro Iter" onPress={this.props.funcoes.irParaTesteCadastroIter} ></Button>
+                            <Button title="Cadastro Iter" onPress={oFuncoes.irParaTesteCadastroIter} ></Button>
                         </View>
                         <View style={{height:50}} >
-                            <Button title="Contrato PDF" onPress={this.props.funcoes.irParaTesteContratoPDF}></Button>
+                            <Button title="Contrato PDF" onPress={oFuncoes.irParaTesteContratoPDF}></Button>
                         </View>
                     </View>
                     <View style={{flex: 1, flexDirection: 'row', alignItems: 'stretch', justifyContent: 'center' }}>
                         <View style={{height:50}} >
-                            <Button title="Boleto GerenciaNet" onPress={this.props.funcoes.irParaTesteBoletoGerenciaNet} ></Button>
+                            <Button title="Boleto GerenciaNet" onPress={oFuncoes.irParaTesteBoletoGerenciaNet} ></Button>
                         </View>
                         <View style={{height:50}} >
                             <Button title="Menu" ></Button>
@@ -177,14 +208,14 @@ export class AreaGrid extends Component {
                     </View>
                     <View style={{flex: 1, flexDirection: 'row', alignItems: 'stretch', justifyContent: 'center' }}>
                         <View style={{height:50}} >
-                            <Button title="Gerar CPF" onPress={this.props.funcoes.gerarDadosTestes} ></Button>
+                            <Button title="Gerar CPF" onPress={oFuncoes.gerarDadosTestes} ></Button>
                         </View>                        
                     </View>
                     <View style={{flex: 1, flexDirection: 'row', alignItems: 'stretch', justifyContent: 'center' }}>
                         <View style={{flex: 1, flexDirection: 'column', alignItems: 'stretch', justifyContent: 'center' }}>
-                            <Input label="Nome Completo" style={styles.Input} value={cliente.nome} onChangeText={(valor) => { estado.cliente.nome = valor; this.setState(estado) }}></Input>                
-                            <Input label="E-mail" style={styles.Input} value={cliente.email} onChangeText={(valor) => { estado.cliente.email = valor; this.setState(estado) }}></Input>
-                            <Input label="CPF" style={styles.Input} value={cliente.cpf} onChangeText={(valor) => { estado.cliente.cpf = valor; this.setState(estado)}}></Input>
+                            <Input label="Nome Completo" style={styles.Input} value={oDadosCliente.nome} onChangeText={(valor) => { oDadosCliente.nome = valor; this.atualizarDados(oDadosCliente) }}></Input>                
+                            <Input label="E-mail" style={styles.Input} value={oDadosCliente.email} onChangeText={(valor) => { oDadosCliente.email = valor; this.atualizarDados(oDadosCliente) }}></Input>
+                            <Input label="CPF" style={styles.Input} value={oDadosCliente.cpf} onChangeText={(valor) => { oDadosCliente.cpf = valor; this.atualizarDados(oDadosCliente) }}></Input>
                         </View>
                     </View>
                 </View>

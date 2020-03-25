@@ -37,10 +37,10 @@ export default class BoletoEmissao extends Component {
     contratar() {
         try {
             let url = objUtil.getURL('/produtos/contratar/');
-            let estado = this.state;
+            let oDadosAppGeral = this.state;
             
-            estado.processandoRequisicao = true;
-            this.setState(estado);
+            oDadosAppGeral.processandoRequisicao = true;
+            this.setState(oDadosAppGeral);
 
             fetch(url, {
                     method: 'POST',
@@ -48,7 +48,7 @@ export default class BoletoEmissao extends Component {
                       Accept: 'application/json',
                       'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(estado)
+                    body: JSON.stringify(oDadosAppGeral)
                   })
                   .then(objUtil.obterJsonResposta)
                   .then((oJsonDados) => {
@@ -60,10 +60,10 @@ export default class BoletoEmissao extends Component {
     }
 
     tratarDadosRetorno(oDados) {
-        let estado = this.state;
+        let oDadosAppGeral = this.state;
 
-        estado.processandoRequisicao = false;
-        this.setState(estado);
+        oDadosAppGeral.processandoRequisicao = false;
+        this.setState(oDadosAppGeral);
 
         if(oDados && oDados.id_cliente_iter) {
             Alert.alert("Cod. cliente Iter: " + oDados.id_cliente_iter);
@@ -76,22 +76,25 @@ export default class BoletoEmissao extends Component {
     }
 
     limpar() {
-        let estado = this.state;
+        let oDadosAppGeral = this.state;
+        let oDadosApp = oDadosAppGeral.dadosApp;
+        let oCliente = oDadosApp.cliente;
 
-        estado.codigo = '';
-        estado.nomeCliente = '';
-        estado.nomeUsuario = '';
-        estado.cpf = '';
-        estado.rg = '';
-        estado.email = '';
-        this.setState(estado);
+        oCliente.codigo = '';
+        oCliente.nomeCliente = '';
+        oCliente.nomeUsuario = '';
+        oCliente.cpf = '';
+        oCliente.rg = '';
+        oCliente.email = '';
+        
+        this.setState(oDadosAppGeral);
     }
 
     capturarDadosFiltroCallBack(oDadosFiltro) {
-        let estado = this.state;
+        let oDadosAppGeral = this.state;
         
-        estado.codigo = oDadosFiltro.codigo;
-        this.setState(estado);
+        oDadosAppGeral.codigo = oDadosFiltro.codigo;
+        this.setState(oDadosAppGeral);
     }
     
     voltar() {

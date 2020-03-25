@@ -91,31 +91,31 @@ export default class ProdutoEscolha extends Component {
                 oProduto = oDados[i];
                 valorTotal += Number.parseFloat(oProduto.valor);
             }
-            let estado = this.state;
+            let oDadosAppGeral = this.state;
             
             let oContrato = {
                 'valorTotal': valorTotal,
                 'listaProdutos': oDados,
             }
-            estado.contrato = oContrato;
+            oDadosAppGeral.contrato = oContrato;
             
-            this.setState(estado);
+            this.setState(oDadosAppGeral);
         }
     }
 
     // atribuirDadosContrato(oJsonDados) {
     //     this.limpar();
     //     if(oJsonDados && oJsonDados.dados) {
-    //         let estado = this.state;
+    //         let oDadosAppGeral = this.state;
 
-    //         estado.codigo = oJsonDados.dados.id.toString();
-    //         estado.nomeCliente = oJsonDados.dados.name;            
-    //         estado.nomeUsuario = oJsonDados.dados.dadosName;
-    //         estado.cpf = oJsonDados.dados.document;
-    //         estado.email = oJsonDados.dados.email;
-    //         estado.telefone = oJsonDados.dados.telefone;
+    //         oDadosAppGeral.codigo = oJsonDados.dados.id.toString();
+    //         oDadosAppGeral.nomeCliente = oJsonDados.dados.name;            
+    //         oDadosAppGeral.nomeUsuario = oJsonDados.dados.dadosName;
+    //         oDadosAppGeral.cpf = oJsonDados.dados.document;
+    //         oDadosAppGeral.email = oJsonDados.dados.email;
+    //         oDadosAppGeral.telefone = oJsonDados.dados.telefone;
             
-    //         this.setState(estado);
+    //         this.setState(oDadosAppGeral);
     //     } else if (oJsonDados.mensagem && oJsonDados.mensagem.trim()){
     //         Alert.alert(oJsonDados.mensagem);
     //     } else {
@@ -126,10 +126,10 @@ export default class ProdutoEscolha extends Component {
     contratar() {
         try {
             let url = objUtil.getURL('/contratos/efetivar/');
-            let estado = this.state;
+            let oDadosAppGeral = this.state;
             
-            estado.processandoRequisicao = true;
-            this.setState(estado);
+            oDadosAppGeral.processandoRequisicao = true;
+            this.setState(oDadosAppGeral);
 
             fetch(url, {
                     method: 'POST',
@@ -137,7 +137,7 @@ export default class ProdutoEscolha extends Component {
                       Accept: 'application/json',
                       'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(estado)
+                    body: JSON.stringify(oDadosAppGeral)
                   })
                   .then(objUtil.obterJsonResposta)
                   .then((oJsonDados) => {
@@ -150,42 +150,42 @@ export default class ProdutoEscolha extends Component {
 
     tratarContratar(oDados) {
         const { navigation } = this.props;
-        var estado = this.state;
+        var oDadosAppGeral = this.state;
         
         if(oDados) {
-            estado.processandoRequisicao = false;
+            oDadosAppGeral.processandoRequisicao = false;
             let contrato = {
-                'valorTotal': estado.contrato.valorTotal,
-                'listaProdutos': estado.contrato.listaProdutos,
+                'valorTotal': oDadosAppGeral.contrato.valorTotal,
+                'listaProdutos': oDadosAppGeral.contrato.listaProdutos,
                 'boleto': {
                     'url_boleto_pdf': oDados.url_boleto_pdf,
                     'url_boleto_html': oDados.url_boleto_html,
                 }
             }
-            estado.contrato = contrato;
+            oDadosAppGeral.contrato = contrato;
         }
-        estado.emCadastro = false;
+        oDadosAppGeral.emCadastro = false;
         
-        this.setState(estado);
+        this.setState(oDadosAppGeral);
         navigation.navigate('BoletoEmissao', this.state);
     }
 
     limpar() {
-        let estado = this.state;
+        let oDadosAppGeral = this.state;
 
-        estado.cliente.nomeCliente = '';
-        estado.cliente.nomeUsuario = '';
-        estado.cliente.cpf = '';
-        estado.cliente.rg = '';
-        estado.cliente.email = '';
-        this.setState(estado);
+        oDadosAppGeral.cliente.nomeCliente = '';
+        oDadosAppGeral.cliente.nomeUsuario = '';
+        oDadosAppGeral.cliente.cpf = '';
+        oDadosAppGeral.cliente.rg = '';
+        oDadosAppGeral.cliente.email = '';
+        this.setState(oDadosAppGeral);
     }
 
     // capturarDadosFiltroCallBack(oDadosFiltro) {
-    //     let estado = this.state;
+    //     let oDadosAppGeral = this.state;
         
-    //     estado.codigo = oDadosFiltro.codigo;
-    //     this.setState(estado);
+    //     oDadosAppGeral.codigo = oDadosFiltro.codigo;
+    //     this.setState(oDadosAppGeral);
     // }
     
     voltar() {

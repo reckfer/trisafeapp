@@ -33,20 +33,17 @@ export default class ClienteInicio extends Component {
         //     message: "My Notification Message", // (required)
         //     date: new Date(Date.now() + 1000) // in 60 secs
         //   });
-        this.limpar = this.limpar.bind(this);
         this.capturarDadosCadastro = this.capturarDadosCadastro.bind(this);
         this.obterCliente = this.obterCliente.bind(this);
-        
-        // this.baixarPDFBoleto = this.baixarPDFBoleto.bind(this);
-        // this.gerarBoleto = this.gerarBoleto.bind(this);        
-        // this.tratarDadosBoleto = this.tratarDadosBoleto.bind(this);
-        
         this.irParaTestesRapidos = this.irParaTestesRapidos.bind(this);
         // this.solicitarPermissoes = this.solicitarPermissoes.bind(this);
         this.tratarDadosCliente = this.tratarDadosCliente.bind(this);
+
         objUtil = new Util();
 
-        this.state = objUtil.inicializarDados();
+        let oNavigation = this.props.navigation;
+        this.state = objUtil.inicializarDados(oNavigation);
+
        // this.solicitarPermissoes();
     }
 
@@ -73,21 +70,21 @@ export default class ClienteInicio extends Component {
     // }
 
     capturarDadosCadastro(oDadosCadastro) {
-        let estado = this.state;
+        let oDadosAppGeral = this.state;
 
-        estado.cliente.cpf = oDadosCadastro.cpf;
-        estado.cliente.email = oDadosCadastro.email;
+        oDadosAppGeral.cliente.cpf = oDadosCadastro.cpf;
+        oDadosAppGeral.cliente.email = oDadosCadastro.email;
 
-        this.setState(estado);
+        this.setState(oDadosAppGeral);
     }
 
     obterCliente() {
         try {
-            let estado = this.state;            
+            let oDadosAppGeral = this.state;            
             let url = objUtil.getURL('/clientes/obter/');
 
-            estado.processandoRequisicao = true;
-            this.setState(estado);
+            oDadosAppGeral.processandoRequisicao = true;
+            this.setState(oDadosAppGeral);
 
             fetch(url, {
                 method: 'POST',
@@ -95,7 +92,7 @@ export default class ClienteInicio extends Component {
                   Accept: 'application/json',
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(estado),
+                body: JSON.stringify(oDadosAppGeral),
               })
                 .then(objUtil.obterJsonResposta)
                 .then((oJsonDados) => {
@@ -113,7 +110,7 @@ export default class ClienteInicio extends Component {
 
     tratarDadosCliente(oDados, oEstado) {
         const { navigation } = this.props;
-        let estado = this.state;
+        let oDadosAppGeral = this.state;
 
         if(oEstado.cod_mensagem === 'NaoCadastrado') {
             Alert.alert('Seu cadastro não foi localizado. Preencha os dados solicitados para realizá-lo.');
@@ -121,13 +118,13 @@ export default class ClienteInicio extends Component {
             Alert.alert(oEstado.mensagem);
         }
         if(oDados) {
-            estado.cliente = oDados;
+            oDadosAppGeral.cliente = oDados;
         }
 
-        estado.processandoRequisicao = false;
-        estado.emCadastro = true;
+        oDadosAppGeral.processandoRequisicao = false;
+        oDadosAppGeral.emCadastro = true;
 
-        navigation.navigate('ClienteDadosPessoais', estado);
+        navigation.navigate('ClienteDadosPessoais', oDadosAppGeral);
     }
 
     tratarDadosBoleto(oDados, oEstado) {
@@ -148,24 +145,24 @@ export default class ClienteInicio extends Component {
         navigation.navigate('TestesInicio');
     }
 
-    limpar() {
-        let estado = this.state;
-
-        estado.cpf = '';
-        estado.email = '';
-        this.setState(estado);
-    }
     botaoIniciar = () => <Button title="Iniciar" onPress={this.obterCliente} loading={this.state.processandoRequisicao}></Button>;
     botaoTestesRapidos = () => <Button title="Testes Rápidos" onPress={this.irParaTestesRapidos} ></Button>;
 
     render() {
-        let dadosCliente = this.state;
+        let dadosApp = this.state.dadosApp;
         let botoesTela = [ { element: this.botaoIniciar }, { element: this.botaoTestesRapidos} ];
+                
+        // const { navigation } = this.props;
         
+        // if(!this.state.emCadastro) {
+        //     // Obtem os dados vindos da tela dados pessoais.
+        //     objUtil.lerDadosNavegacao(dadosCliente, navigation);
+        // }
+
         return (
             <View style={styles.areaCliente}>
                 <Cabecalho titulo='Cadastro' nomeTela='Início' />
-                <AreaDados parentCallBack={this.capturarDadosFiltroCallBack} capturarDadosCallBack={this.capturarDadosCadastro} dadosCliente={dadosCliente}/>
+                <AreaDados dadosApp={dadosApp}/>
                 <AreaBotoes botoes={botoesTela} />
             </View>
         );
@@ -178,14 +175,22 @@ export class AreaDados extends Component {
         super(props);
     }
 
+    atualizarDados(oDadosCliente) {
+        let oDadosNavegacao = this.props.dadosApp;
+        oDadosNavegacao.cliente = oDadosCliente;
+        
+        this.setState(oDadosNavegacao);
+    }
+
     render() {
+        let oDadosCliente = this.props.dadosApp.cliente;
 
         return (
             <ScrollView>
                 <ThemeProvider theme={theme}>
                     <View style={styles.areaDadosCliente}>
-                        <Input placeholder="Informe seu E-Mail" label="E-Mail" onChangeText={(valor) => { this.props.dadosCliente.email = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
-                        <Input placeholder="Informe seu CPF" label="CPF" onChangeText={(valor) => { this.props.dadosCliente.cpf = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
+                        <Input placeholder="Informe seu E-Mail" label="E-Mail" value={oDadosCliente.email} onChangeText={(valor) => { oDadosCliente.email = valor; this.atualizarDados(oDadosCliente)}}></Input>
+                        <Input placeholder="Informe seu CPF" label="CPF" value={oDadosCliente.cpf} onChangeText={(valor) => { oDadosCliente.cpf = valor; this.atualizarDados(oDadosCliente)}}></Input>
                     </View>
                 </ThemeProvider>
             </ScrollView>
@@ -203,11 +208,11 @@ export class AreaDados extends Component {
 
 // gerarBoleto() {
 //     try {
-//         let estado = this.state;            
+//         let oDadosAppGeral = this.state;            
 //         let url = objUtil.getURL('/boletos/gerarBoleto/');
 
-//         estado.processandoRequisicao = true;
-//         this.setState(estado);
+//         oDadosAppGeral.processandoRequisicao = true;
+//         this.setState(oDadosAppGeral);
 
 //         fetch(url, {
 //             method: 'POST',

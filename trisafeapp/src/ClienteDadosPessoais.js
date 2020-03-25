@@ -43,16 +43,16 @@ export default class ClienteDadosPessoais extends Component {
     }
 
     limpar() {
-        let estado = this.state;
+        let oDadosAppGeral = this.state;
 
-        estado.cliente.codigo = '';
-        estado.cliente.nomeCliente = '';
-        estado.cliente.nomeUsuario = '';
-        estado.cliente.cpf = '';
-        estado.cliente.rg = '';
-        estado.cliente.email = '';
-        estado.cliente.telefone = '';
-        this.setState(estado);
+        oDadosAppGeral.cliente.codigo = '';
+        oDadosAppGeral.cliente.nomeCliente = '';
+        oDadosAppGeral.cliente.nomeUsuario = '';
+        oDadosAppGeral.cliente.cpf = '';
+        oDadosAppGeral.cliente.rg = '';
+        oDadosAppGeral.cliente.email = '';
+        oDadosAppGeral.cliente.telefone = '';
+        this.setState(oDadosAppGeral);
     }
 
     confirmar() {
@@ -71,21 +71,21 @@ export default class ClienteDadosPessoais extends Component {
     }
         
     capturarDadosCadastro(oDadosCadastro) {
-        let estado = this.state;
+        let oDadosAppGeral = this.state;
     
-        estado.cliente.cpf = oDadosCadastro.cpf;
-        estado.cliente.rg = oDadosCadastro.rg;
-        estado.cliente.nome = oDadosCadastro.nome;
-        estado.cliente.nomeUsuario = oDadosCadastro.nomeUsuario;
-        estado.cliente.email = oDadosCadastro.email;
-        estado.cliente.telefone = oDadosCadastro.telefone;
-        estado.emCadastro = true;
+        oDadosAppGeral.cliente.cpf = oDadosCadastro.cpf;
+        oDadosAppGeral.cliente.rg = oDadosCadastro.rg;
+        oDadosAppGeral.cliente.nome = oDadosCadastro.nome;
+        oDadosAppGeral.cliente.nomeUsuario = oDadosCadastro.nomeUsuario;
+        oDadosAppGeral.cliente.email = oDadosCadastro.email;
+        oDadosAppGeral.cliente.telefone = oDadosCadastro.telefone;
+        oDadosAppGeral.emCadastro = true;
         
-        this.setState(estado);
+        this.setState(oDadosAppGeral);
     }
 
     render() {
-        let dadosCliente = this.state.cliente;
+        let dadosApp = this.state.dadosApp;
         const { navigation } = this.props;        
         let botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>
         let botaoAvancar = () => <Button title="Avançar" onPress={this.confirmar} ></Button>
@@ -100,7 +100,7 @@ export default class ClienteDadosPessoais extends Component {
         return (
             <View style={styles.areaCliente}>
                 <Cabecalho titulo='Cadastro' nomeTela='Meus dados' />
-                <AreaDados capturarDadosCallBack={this.capturarDadosCadastro} dadosCliente={dadosCliente}/>
+                <AreaDados capturarDadosCallBack={this.capturarDadosCadastro} dadosApp={dadosApp}/>
                 <AreaBotoes botoes={botoesTela}/>
             </View>
         );

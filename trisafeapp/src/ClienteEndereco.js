@@ -46,17 +46,17 @@ export default class ClienteEndereco extends Component {
     atribuirDadosCliente(oJsonDados) {
         this.limpar();
         if(oJsonDados && oJsonDados.dados) {
-            let estado = this.state;
+            let oDadosAppGeral = this.state;
 
-            estado.cliente.cidade = oJsonDados.dados.cidade;
-            estado.cliente.rua = oJsonDados.dados.rua;            
-            estado.cliente.numero = oJsonDados.dados.numero;
-            estado.cliente.complemento = oJsonDados.dados.complemento;
-            estado.cliente.bairro = oJsonDados.dados.bairro;
-            estado.cliente.uf = oJsonDados.dados.uf;
-            estado.cliente.cep = oJsonDados.dados.cep;
+            oDadosAppGeral.cliente.cidade = oJsonDados.dados.cidade;
+            oDadosAppGeral.cliente.rua = oJsonDados.dados.rua;            
+            oDadosAppGeral.cliente.numero = oJsonDados.dados.numero;
+            oDadosAppGeral.cliente.complemento = oJsonDados.dados.complemento;
+            oDadosAppGeral.cliente.bairro = oJsonDados.dados.bairro;
+            oDadosAppGeral.cliente.uf = oJsonDados.dados.uf;
+            oDadosAppGeral.cliente.cep = oJsonDados.dados.cep;
             
-            this.setState(estado);
+            this.setState(oDadosAppGeral);
         } else if (oJsonDados.mensagem && oJsonDados.mensagem.trim()){
             Alert.alert(oJsonDados.mensagem);
         } else {
@@ -65,16 +65,16 @@ export default class ClienteEndereco extends Component {
     }
 
     limpar() {
-        let estado = this.state;
+        let oDadosAppGeral = this.state;
 
-        estado.cliente.cidade = '';
-        estado.cliente.rua = '';
-        estado.cliente.numero = '';
-        estado.cliente.complemento = '';
-        estado.cliente.bairro = '';
-        estado.cliente.cep = '';
-        estado.cliente.uf = '';
-        this.setState(estado);
+        oDadosAppGeral.cliente.cidade = '';
+        oDadosAppGeral.cliente.rua = '';
+        oDadosAppGeral.cliente.numero = '';
+        oDadosAppGeral.cliente.complemento = '';
+        oDadosAppGeral.cliente.bairro = '';
+        oDadosAppGeral.cliente.cep = '';
+        oDadosAppGeral.cliente.uf = '';
+        this.setState(oDadosAppGeral);
     }
 
     confirmar() {
@@ -87,18 +87,18 @@ export default class ClienteEndereco extends Component {
     }
 
     capturarDadosCadastro(oDadosCadastro) {
-        let estado = this.state;
+        let oDadosAppGeral = this.state;
     
-        estado.cliente.cidade = oDadosCadastro.cidade;
-        estado.cliente.rua = oDadosCadastro.rua;
-        estado.cliente.numero = oDadosCadastro.numero;
-        estado.cliente.complemento = oDadosCadastro.complemento;
-        estado.cliente.bairro = oDadosCadastro.bairro;
-        estado.cliente.cep = oDadosCadastro.cep;
-        estado.cliente.uf = oDadosCadastro.uf;
-        estado.emCadastro = true;
+        oDadosAppGeral.cliente.cidade = oDadosCadastro.cidade;
+        oDadosAppGeral.cliente.rua = oDadosCadastro.rua;
+        oDadosAppGeral.cliente.numero = oDadosCadastro.numero;
+        oDadosAppGeral.cliente.complemento = oDadosCadastro.complemento;
+        oDadosAppGeral.cliente.bairro = oDadosCadastro.bairro;
+        oDadosAppGeral.cliente.cep = oDadosCadastro.cep;
+        oDadosAppGeral.cliente.uf = oDadosCadastro.uf;
+        oDadosAppGeral.emCadastro = true;
 
-        this.setState(estado);
+        this.setState(oDadosAppGeral);
     }
 
     voltar() {
@@ -108,7 +108,7 @@ export default class ClienteEndereco extends Component {
     }
 
     render() {
-        let dadosCliente = this.state.cliente;
+        let dadosApp = this.state.dadosApp;
         const { navigation } = this.props;
         let botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>
         let botaoAvancar = () => <Button title="Avançar" onPress={this.confirmar} ></Button>
@@ -119,10 +119,11 @@ export default class ClienteEndereco extends Component {
             // Obtem os dados vindos da tela dados pessoais.
             objUtil.lerDadosNavegacao(dadosCliente, navigation);
         }
+
         return (
             <View style={styles.areaCliente}>
                 <Cabecalho titulo='Cadastro' nomeTela='Endereço' />
-                <AreaDados capturarDadosCallBack={this.capturarDadosCadastro} dadosCliente={dadosCliente}/>
+                <AreaDados capturarDadosCallBack={this.capturarDadosCadastro} dadosApp={dadosApp}/>
                 <AreaBotoes botoes={botoesTela} />
             </View>
         );

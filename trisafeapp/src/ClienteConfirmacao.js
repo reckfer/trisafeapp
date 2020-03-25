@@ -37,10 +37,10 @@ export default class ClienteConfirmacao extends Component {
     salvar() {
         try {
             let url = objUtil.getURL('/clientes/incluir/');
-            let estado = this.state;
+            let oDadosAppGeral = this.state;
             
-            estado.processandoRequisicao = true;
-            this.setState(estado);
+            oDadosAppGeral.processandoRequisicao = true;
+            this.setState(oDadosAppGeral);
 
             fetch(url, {
                     method: 'POST',
@@ -48,7 +48,7 @@ export default class ClienteConfirmacao extends Component {
                       Accept: 'application/json',
                       'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(estado)
+                    body: JSON.stringify(oDadosAppGeral)
                   })
                   .then(objUtil.obterJsonResposta)
                   .then((oJsonDados) => {
@@ -60,10 +60,10 @@ export default class ClienteConfirmacao extends Component {
     }
 
     tratarDadosRetorno(oDados) {
-        let estado = this.state;
+        let oDadosAppGeral = this.state;
 
-        estado.processandoRequisicao = false;
-        this.setState(estado);
+        oDadosAppGeral.processandoRequisicao = false;
+        this.setState(oDadosAppGeral);
 
         if(oDados && oDados.id_cliente_iter) {
             Alert.alert("Cod. cliente Iter: " + oDados.id_cliente_iter);
@@ -71,22 +71,22 @@ export default class ClienteConfirmacao extends Component {
     }
 
     limpar() {
-        let estado = this.state;
+        let oDadosAppGeral = this.state;
 
-        estado.cliente.codigo = '';
-        estado.cliente.nomeCliente = '';
-        estado.cliente.nomeUsuario = '';
-        estado.cliente.cpf = '';
-        estado.cliente.rg = '';
-        estado.cliente.email = '';
-        this.setState(estado);
+        oDadosAppGeral.cliente.codigo = '';
+        oDadosAppGeral.cliente.nomeCliente = '';
+        oDadosAppGeral.cliente.nomeUsuario = '';
+        oDadosAppGeral.cliente.cpf = '';
+        oDadosAppGeral.cliente.rg = '';
+        oDadosAppGeral.cliente.email = '';
+        this.setState(oDadosAppGeral);
     }
 
     capturarDadosFiltroCallBack(oDadosFiltro) {
-        let estado = this.state;
+        let oDadosAppGeral = this.state;
         
-        estado.cliente.codigo = oDadosFiltro.codigo;
-        this.setState(estado);
+        oDadosAppGeral.cliente.codigo = oDadosFiltro.codigo;
+        this.setState(oDadosAppGeral);
     }
      
     voltar() {
@@ -103,7 +103,7 @@ export default class ClienteConfirmacao extends Component {
     botaoConfirmar = () => <Button title="Confirmar" onPress={this.salvar} loading={this.state.processandoRequisicao} ></Button>;
 
     render() {
-        let dadosCliente = this.state.cliente;
+        let dadosApp = this.state.dadosApp;
         const { navigation } = this.props;
 
         let botoesTela = [ { element: this.botaoVoltar }, { element: this.botaoConfirmar } ];
@@ -114,7 +114,7 @@ export default class ClienteConfirmacao extends Component {
         return (
             <View style={styles.areaCliente}>
                 <Cabecalho titulo='Cadastro' nomeTela='Confirmação' />
-                <AreaDados parentCallBack={this.capturarDadosFiltroCallBack} dadosCliente={dadosCliente}/>
+                <AreaDados parentCallBack={this.capturarDadosFiltroCallBack} dadosApp={dadosApp}/>
                 <AreaBotoes botoes={botoesTela} />
             </View>
         );
