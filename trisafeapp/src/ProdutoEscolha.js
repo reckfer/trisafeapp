@@ -18,6 +18,7 @@ import { Card, CardTitle, CardContent, CardAction, CardButton, CardImage } from 
 import Cabecalho from './common/CabecalhoTela';
 import { styles, theme } from './common/Estilos';
 import AreaBotoes from './common/AreaBotoes';
+import GerenciadorDadosApp from './common/GerenciadorDadosApp';
 
 export default class ProdutoEscolha extends Component {
     static navigationOptions = {
@@ -25,33 +26,34 @@ export default class ProdutoEscolha extends Component {
     }
     constructor(props) {
         super(props);
-        
-        this.limpar = this.limpar.bind(this);
+        let oNavigation = this.props.navigation;
         this.voltar = this.voltar.bind(this);
         this.listarProdutos = this.listarProdutos.bind(this);
         this.tratarListarProdutos = this.tratarListarProdutos.bind(this);
         this.contratar = this.contratar.bind(this);
-        this.tratarContratar = this.tratarContratar.bind(this);        
-        // this.capturarDadosFiltroCallBack = this.capturarDadosFiltroCallBack.bind(this);
+        this.tratarContratar = this.tratarContratar.bind(this);
+    
+        // let dados = oGerenciadorDadosApp.inicializarDados();
+        // const { navigation } = this.props;
         
-        objUtil = new Util();
-        
-        let dados = objUtil.inicializarDados();
-        const { navigation } = this.props;
-        
-        // Obtem os dados vindos da tela anterior.
-        let dadosCliente = dados.cliente;
-        objUtil.lerDadosNavegacao(dadosCliente, navigation);
-        dados.cliente = dadosCliente;
+        // // Obtem os dados vindos da tela anterior.
+        // let dadosCliente = dados.cliente;
+        // oUtil.lerDadosNavegacao(dadosCliente, navigation);
+        // dados.cliente = dadosCliente;
 
-        this.state = dados;
+        // this.state = dados;
+
+        oUtil = new Util();
+        oGerenciadorDadosApp = new GerenciadorDadosApp(oNavigation);
+
+        this.state = oGerenciadorDadosApp.getDadosAppGeral();
         
         this.listarProdutos();
     }
 
     listarProdutos(){
         try {
-            let url = objUtil.getURL('/produtos/listar/');
+            let url = oUtil.getURL('/produtos/listar/');
 
             fetch(url, {
                 method: 'POST',
@@ -62,9 +64,9 @@ export default class ProdutoEscolha extends Component {
                 body: JSON.stringify({
                 }),
               })
-                .then(objUtil.obterJsonResposta)
+                .then(oUtil.obterJsonResposta)
                 .then((oJsonDados) => {
-                    objUtil.tratarRetornoServidor(oJsonDados, this.tratarListarProdutos, true);
+                    oUtil.tratarRetornoServidor(oJsonDados, this.tratarListarProdutos, true);
                 })
                 .catch(function (erro) {
                     Alert.alert(erro.message);
@@ -85,47 +87,29 @@ export default class ProdutoEscolha extends Component {
         }
         console.log(oDados);
         if(oDados && Array.isArray(oDados)) {
+            oGerenciadorDadosApp.atribuirDados('produtos_contratados', oDados);
+
             let valorTotal = 0.00;
             for(let i = 0; i < oDados.length; i++)  {
             
                 oProduto = oDados[i];
                 valorTotal += Number.parseFloat(oProduto.valor);
             }
-            let oDadosAppGeral = this.state;
+            let oDadosAppGeral = oGerenciadorDadosApp.getDadosAppGeral();
             
-            let oContrato = {
-                'valorTotal': valorTotal,
-                'listaProdutos': oDados,
-            }
-            oDadosAppGeral.contrato = oContrato;
+            // let oContrato = {
+            //     'valorTotal': valorTotal,
+            //     'listaProdutos': oDados,
+            // }
+            oDadosAppGeral.dadosApp.contrato.valorTotal = valorTotal;
             
             this.setState(oDadosAppGeral);
         }
     }
 
-    // atribuirDadosContrato(oJsonDados) {
-    //     this.limpar();
-    //     if(oJsonDados && oJsonDados.dados) {
-    //         let oDadosAppGeral = this.state;
-
-    //         oDadosAppGeral.codigo = oJsonDados.dados.id.toString();
-    //         oDadosAppGeral.nomeCliente = oJsonDados.dados.name;            
-    //         oDadosAppGeral.nomeUsuario = oJsonDados.dados.dadosName;
-    //         oDadosAppGeral.cpf = oJsonDados.dados.document;
-    //         oDadosAppGeral.email = oJsonDados.dados.email;
-    //         oDadosAppGeral.telefone = oJsonDados.dados.telefone;
-            
-    //         this.setState(oDadosAppGeral);
-    //     } else if (oJsonDados.mensagem && oJsonDados.mensagem.trim()){
-    //         Alert.alert(oJsonDados.mensagem);
-    //     } else {
-    //         Alert.alert('Cadastrado não localizado.');
-    //     }
-    // }
-
     contratar() {
         try {
-            let url = objUtil.getURL('/contratos/efetivar/');
+            let url = oUtil.getURL('/contratos/efetivar/');
             let oDadosAppGeral = this.state;
             
             oDadosAppGeral.processandoRequisicao = true;
@@ -139,9 +123,9 @@ export default class ProdutoEscolha extends Component {
                     },
                     body: JSON.stringify(oDadosAppGeral)
                   })
-                  .then(objUtil.obterJsonResposta)
+                  .then(oUtil.obterJsonResposta)
                   .then((oJsonDados) => {
-                      objUtil.tratarRetornoServidor(oJsonDados, this.tratarContratar);
+                      oUtil.tratarRetornoServidor(oJsonDados, this.tratarContratar);
                   })
         } catch (exc) {
             Alert.alert(exc);
@@ -169,24 +153,6 @@ export default class ProdutoEscolha extends Component {
         this.setState(oDadosAppGeral);
         navigation.navigate('BoletoEmissao', this.state);
     }
-
-    limpar() {
-        let oDadosAppGeral = this.state;
-
-        oDadosAppGeral.cliente.nomeCliente = '';
-        oDadosAppGeral.cliente.nomeUsuario = '';
-        oDadosAppGeral.cliente.cpf = '';
-        oDadosAppGeral.cliente.rg = '';
-        oDadosAppGeral.cliente.email = '';
-        this.setState(oDadosAppGeral);
-    }
-
-    // capturarDadosFiltroCallBack(oDadosFiltro) {
-    //     let oDadosAppGeral = this.state;
-        
-    //     oDadosAppGeral.codigo = oDadosFiltro.codigo;
-    //     this.setState(oDadosAppGeral);
-    // }
     
     voltar() {
         const { navigation } = this.props;
@@ -201,15 +167,14 @@ export default class ProdutoEscolha extends Component {
     botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;        
     
     render() {
-        const { navigation } = this.props;
-        let contrato = this.state.contrato;
+        let dadosApp = this.state.dadosApp;
         
         let botoesTela = [ { element: this.botaoVoltar }];
         
         return (
             <View style={styles.areaCliente}>
                 <Cabecalho titulo='Produto' nomeTela='Contratação' />
-                <AreaDados contratar={this.contratar} contrato={contrato}/>
+                <AreaDados contratar={this.contratar} dadosApp={dadosApp}/>
                 <AreaBotoes botoes={botoesTela} />
             </View>
         );
@@ -223,12 +188,12 @@ export class AreaDados extends Component {
     }
 
     render() {
-        let listaProdutos = this.props.contrato.listaProdutos;
+        let listaProdutos = this.props.dadosApp.contrato.produtos_contratados;
         var listaProdutosCartao = [];
         let oCard;
         let oProduto;
         let produtoFormatado;
-        let valorTotal = this.props.contrato.valorTotal;
+        let valorTotal = this.props.dadosApp.contrato.valorTotal;
 
         for(let i = 0; i < listaProdutos.length; i++)  {
             

@@ -30,13 +30,15 @@ export default class BoletoEmissao extends Component {
         this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
         this.capturarDadosFiltroCallBack = this.capturarDadosFiltroCallBack.bind(this);
         
-        objUtil = new Util();
-        this.state = objUtil.inicializarDados();
+        oUtil = new Util();
+        oGerenciadorDadosApp = new GerenciadorDadosApp();
+        
+        this.state = oGerenciadorDadosApp.inicializarDados();
     }
 
     contratar() {
         try {
-            let url = objUtil.getURL('/produtos/contratar/');
+            let url = oUtil.getURL('/produtos/contratar/');
             let oDadosAppGeral = this.state;
             
             oDadosAppGeral.processandoRequisicao = true;
@@ -50,9 +52,9 @@ export default class BoletoEmissao extends Component {
                     },
                     body: JSON.stringify(oDadosAppGeral)
                   })
-                  .then(objUtil.obterJsonResposta)
+                  .then(oUtil.obterJsonResposta)
                   .then((oJsonDados) => {
-                      objUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetorno);
+                      oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetorno);
                   })
         } catch (exc) {
             Alert.alert(exc);
@@ -113,7 +115,7 @@ export default class BoletoEmissao extends Component {
         let botoesTela = [ { element: this.botaoVoltar }, { element: this.botaoConfirmar } ];
 
         // Obtem os dados vindos da tela dados pessoais.
-        // objUtil.lerDadosNavegacao(dadosCliente, navigation);
+        // oUtil.lerDadosNavegacao(dadosCliente, navigation);
         oContrato = navigation.getParam('contrato');
         oBoleto = oContrato.boleto;
         

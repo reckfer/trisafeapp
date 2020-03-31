@@ -72,11 +72,13 @@ const composicaoDadosApp = {
 }
 
 export default class Util {
+    oDadosReferencia;
 
     constructor(){
         //this.inicializarDadosCliente = this.montarFragmento.bind(this);
         this.inicializarDadosCliente = this.inicializarDadosCliente.bind(this);
         this.inicializarDadosContrato = this.inicializarDadosContrato.bind(this);
+        this.oDadosReferencia = null;
     }
     
     getURL(metodo){
@@ -105,7 +107,7 @@ export default class Util {
     tratarRetornoServidor(oJsonRetorno, oFuncaoTratarDados, suprimirMsgServidor) {
         
         if(oJsonRetorno) {
-            let oEstado = oJsonRetorno.oDadosAppGeral;
+            let oEstado = oJsonRetorno.estado;
             let oDados = oJsonRetorno.dados;
 
             if (!suprimirMsgServidor && oEstado.mensagem && oEstado.mensagem.trim()){
@@ -191,13 +193,6 @@ export default class Util {
 
     //     return oDadosAppGeral;
     // }
-
-    inicializarDados() {
-        let oDadosApp = this.montarDadosApp(composicaoDadosApp);
-
-        return oDadosApp;
-    }
-
     montarDadosApp(oComposicaoDadosApp) {
         let oDadosApp = {};
         let oFragmentoRaiz;
@@ -242,14 +237,18 @@ export default class Util {
 
                 if(chavesCampos && chavesCampos.length > 0) {
                     chaveCampo = chavesCampos[0];
-                    
-                    if(!oDadosFragmento.hasOwnProperty(chaveCampo)) {
-                        oDadosFragmento[chaveCampo] = {};
-                    }
 
-                    oItemFragmento = oFragmento[chaveCampo];
-                    fragmentosProcessar = this.preencherFragmento(oDadosFragmento, oItemFragmento, chaveCampo);
-                    this.adicionarArray(oFragmentoLista, fragmentosProcessar);
+                    if(oFragmento[chaveCampo] instanceof Array) {
+                        oDadosFragmento[chaveCampo] = oFragmento[chaveCampo];
+                    } else {
+                        if (!oDadosFragmento.hasOwnProperty(chaveCampo)) {
+                            oDadosFragmento[chaveCampo] = {};
+                        }
+
+                        oItemFragmento = oFragmento[chaveCampo];
+                        fragmentosProcessar = this.preencherFragmento(oDadosFragmento, oItemFragmento, chaveCampo);
+                        this.adicionarArray(oFragmentoLista, fragmentosProcessar);
+                    }
                 }
             }
         }
@@ -286,7 +285,9 @@ export default class Util {
             oObjetoPrincipal[campo] = oItemFragmento[campo];
 
             if(oItemFragmento[campo] instanceof Array) {                
-                incluir = true;                
+                oObjetoProcessar = {};
+                oObjetoProcessar[campo] = oItemFragmento[campo];
+                fragmentosProcessar.push(oObjetoProcessar);
             } else if (oItemFragmento[campo] instanceof Object) {
                 temCampo = false;
                 for (campoTmp in oObjetoPrincipal[campo]) {            
@@ -296,11 +297,6 @@ export default class Util {
                 if(!temCampo) {
                     oObjetoPrincipal[campo] = oObjetoPrincipalFinal[campo];
                 }
-            }
-            if(incluir) {
-                oObjetoProcessar = {};
-                oObjetoProcessar[campo] = oItemFragmento[campo];
-                fragmentosProcessar.push(oObjetoProcessar);
             }
         }
         return fragmentosProcessar;
@@ -328,5 +324,73 @@ export default class Util {
                 'url_boleto_html': '',
             }
         };
+    }
+    inicializarDados(oNavigation) {
+        
+        if(!this.oDadosReferencia){
+            this.oDadosReferencia = this.montarDadosApp(composicaoDadosApp);
+        }
+
+        if(oNavigation) {
+            let oDadosApp = oNavigation.getParam('dadosApp');
+
+            if(oDadosApp) {
+                this.atribuirDados('', oDadosApp);
+            }
+        }
+
+        return this.oDadosReferencia;
+    }
+
+    atribuirDados(nomeAtributo, oDadosAtribuir) {
+        let oDados = this.oDadosReferencia.dadosApp;
+
+        for (campo in oDados) {
+            if(nomeAtributo) {
+                if(nomeAtributo === campo) {
+                    this.atribuirDadosObjeto(oDados[nomeAtributo], oDadosAtribuir);
+                }
+            }
+            else
+            {
+                if(oDados[campo] instanceof Array) {
+                    if(oDados[campo].length > 0) {
+                        let oArrayDados = oDados[campo];
+                        let oItemArray = oArrayDados[0];
+                        let oDadosItem = {};
+                        let oArrayAtribuir = oDadosAtribuir[campo];                        
+                        let campoItem = Object.keys(oItemArray)[0];
+                        oArrayDados.length = 0;
+                        for(let i = 0; i < oArrayAtribuir.length; i++) {
+                            for(campoNovo in oItemArray[campoItem]) {
+                                oDadosItem[campoNovo] = '';
+                            }
+                            
+                            this.atribuirDadosObjeto(oDadosItem, oArrayAtribuir[i][campoItem]);
+                            oArrayDados.push(oDadosItem);
+                        }
+                        
+                    }
+                } else {
+                    this.atribuirDadosObjeto(oDados[campo], oDadosAtribuir[campo]);
+                }
+            }
+        }
+
+        return this.oDadosReferencia;
+    }
+
+    atribuirDadosObjeto(oObjetoReceber, oDadosAtribuir) {        
+        for(campo in oObjetoReceber) {
+            oObjetoReceber[campo] = this.atribuir(campo, oDadosAtribuir);
+        }
+    }
+
+    atribuir(nomeAtributo, oDadosAtribuir) {
+        for(campo in oDadosAtribuir) {
+            if(nomeAtributo === campo) {
+                return oDadosAtribuir[nomeAtributo];
+            }
+        }
     }
 }

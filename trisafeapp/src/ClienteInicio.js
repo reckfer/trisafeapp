@@ -19,6 +19,7 @@ import Util from './common/Util';
 import Cabecalho from './common/CabecalhoTela';
 import AreaBotoes from './common/AreaBotoes';
 import { styles, theme } from './common/Estilos';
+import GerenciadorDadosApp from './common/GerenciadorDadosApp';
 
 export default class ClienteInicio extends Component {
     static navigationOptions = {
@@ -33,19 +34,21 @@ export default class ClienteInicio extends Component {
         //     message: "My Notification Message", // (required)
         //     date: new Date(Date.now() + 1000) // in 60 secs
         //   });
+        let oNavigation = this.props.navigation;
         this.capturarDadosCadastro = this.capturarDadosCadastro.bind(this);
         this.obterCliente = this.obterCliente.bind(this);
         this.irParaTestesRapidos = this.irParaTestesRapidos.bind(this);
         // this.solicitarPermissoes = this.solicitarPermissoes.bind(this);
         this.tratarDadosCliente = this.tratarDadosCliente.bind(this);
 
-        objUtil = new Util();
+        oUtil = new Util();
+        oGerenciadorDadosApp = new GerenciadorDadosApp(oNavigation);
 
-        let oNavigation = this.props.navigation;
-        this.state = objUtil.inicializarDados(oNavigation);
+        this.state = oGerenciadorDadosApp.getDadosAppGeral();
 
        // this.solicitarPermissoes();
     }
+    
 
     // async solicitarPermissoes(){
     //     try {
@@ -81,7 +84,7 @@ export default class ClienteInicio extends Component {
     obterCliente() {
         try {
             let oDadosAppGeral = this.state;            
-            let url = objUtil.getURL('/clientes/obter/');
+            let url = oUtil.getURL('/clientes/obter/');
 
             oDadosAppGeral.processandoRequisicao = true;
             this.setState(oDadosAppGeral);
@@ -94,9 +97,9 @@ export default class ClienteInicio extends Component {
                 },
                 body: JSON.stringify(oDadosAppGeral),
               })
-                .then(objUtil.obterJsonResposta)
+                .then(oUtil.obterJsonResposta)
                 .then((oJsonDados) => {
-                    objUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosCliente, true);
+                    oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosCliente, true);
                 })
                 .catch(function (erro) {
                     Alert.alert(erro.message);
@@ -118,7 +121,8 @@ export default class ClienteInicio extends Component {
             Alert.alert(oEstado.mensagem);
         }
         if(oDados) {
-            oDadosAppGeral.cliente = oDados;
+            // oDadosAppGeral.cliente = oDados;
+            oDadosAppGeral = oGerenciadorDadosApp.atribuirDados('cliente', oDados);
         }
 
         oDadosAppGeral.processandoRequisicao = false;
@@ -142,7 +146,7 @@ export default class ClienteInicio extends Component {
     irParaTestesRapidos(){
         const { navigation } = this.props;
         
-        navigation.navigate('TestesInicio');
+        navigation.navigate('TestesInicio', this.state);
     }
 
     botaoIniciar = () => <Button title="Iniciar" onPress={this.obterCliente} loading={this.state.processandoRequisicao}></Button>;
@@ -156,7 +160,7 @@ export default class ClienteInicio extends Component {
         
         // if(!this.state.emCadastro) {
         //     // Obtem os dados vindos da tela dados pessoais.
-        //     objUtil.lerDadosNavegacao(dadosCliente, navigation);
+        //     oUtil.lerDadosNavegacao(dadosCliente, navigation);
         // }
 
         return (
@@ -175,22 +179,29 @@ export class AreaDados extends Component {
         super(props);
     }
 
-    atualizarDados(oDadosCliente) {
-        let oDadosNavegacao = this.props.dadosApp;
-        oDadosNavegacao.cliente = oDadosCliente;
+    // atualizarDados(oDadosCliente) {
+    //     let oDadosApp = this.props.dadosApp;
+
+    //     oGerenciadorDadosApp = new GerenciadorDadosApp(oDadosApp);
+
+    //     oDadosAppGeral = oGerenciadorDadosApp.atribuirDados('cliente', oDadosCliente);
+    //     // this.state = oGerenciadorDadosApp.inicializarDados(oNavigation);
+    //     // let oDadosNavegacao = this.props.dadosApp;
+    //     // oDadosNavegacao.cliente = oDadosCliente;
         
-        this.setState(oDadosNavegacao);
-    }
+    //     this.setState(oDadosAppGeral);
+    // }
 
     render() {
-        let oDadosCliente = this.props.dadosApp.cliente;
+        let oDadosApp = this.props.dadosApp;
+        let oDadosCliente = oDadosApp.cliente;
 
         return (
             <ScrollView>
                 <ThemeProvider theme={theme}>
                     <View style={styles.areaDadosCliente}>
-                        <Input placeholder="Informe seu E-Mail" label="E-Mail" value={oDadosCliente.email} onChangeText={(valor) => { oDadosCliente.email = valor; this.atualizarDados(oDadosCliente)}}></Input>
-                        <Input placeholder="Informe seu CPF" label="CPF" value={oDadosCliente.cpf} onChangeText={(valor) => { oDadosCliente.cpf = valor; this.atualizarDados(oDadosCliente)}}></Input>
+                        <Input placeholder="Informe seu E-Mail" label="E-Mail" value={oDadosCliente.email} onChangeText={(valor) => { oDadosCliente.email = valor; this.setState(this.props)}}></Input>
+                        <Input placeholder="Informe seu CPF" label="CPF" value={oDadosCliente.cpf} onChangeText={(valor) => { oDadosCliente.cpf = valor; this.setState(this.props)}}></Input>
                     </View>
                 </ThemeProvider>
             </ScrollView>
@@ -209,7 +220,7 @@ export class AreaDados extends Component {
 // gerarBoleto() {
 //     try {
 //         let oDadosAppGeral = this.state;            
-//         let url = objUtil.getURL('/boletos/gerarBoleto/');
+//         let url = oUtil.getURL('/boletos/gerarBoleto/');
 
 //         oDadosAppGeral.processandoRequisicao = true;
 //         this.setState(oDadosAppGeral);
@@ -223,9 +234,9 @@ export class AreaDados extends Component {
 //             body: JSON.stringify({
 //             }),
 //           })
-//             .then(objUtil.obterJsonResposta)
+//             .then(oUtil.obterJsonResposta)
 //             .then((oJsonDados) => {
-//                 objUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosBoleto, true);
+//                 oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosBoleto, true);
 //             })
 //             .catch(function (erro) {
 //                 Alert.alert(erro.message);

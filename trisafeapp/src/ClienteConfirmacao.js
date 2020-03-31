@@ -16,6 +16,7 @@ import { ThemeProvider, Input, Button } from 'react-native-elements';
 import Cabecalho from './common/CabecalhoTela';
 import { styles, theme } from './common/Estilos';
 import AreaBotoes from './common/AreaBotoes';
+import GerenciadorDadosApp from './common/GerenciadorDadosApp';
 
 export default class ClienteConfirmacao extends Component {
     static navigationOptions = {
@@ -23,20 +24,20 @@ export default class ClienteConfirmacao extends Component {
     }
     constructor(props) {
         super(props);
-        
-        this.limpar = this.limpar.bind(this);
+        let oNavigation = this.props.navigation;
         this.salvar = this.salvar.bind(this);
         this.voltar = this.voltar.bind(this);
         this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
-        this.capturarDadosFiltroCallBack = this.capturarDadosFiltroCallBack.bind(this);
         
-        objUtil = new Util();
-        this.state = objUtil.inicializarDados();
+        oUtil = new Util();
+        oGerenciadorDadosApp = new GerenciadorDadosApp(oNavigation);
+
+        this.state = oGerenciadorDadosApp.getDadosAppGeral();
     }
 
     salvar() {
         try {
-            let url = objUtil.getURL('/clientes/incluir/');
+            let url = oUtil.getURL('/clientes/incluir/');
             let oDadosAppGeral = this.state;
             
             oDadosAppGeral.processandoRequisicao = true;
@@ -50,9 +51,9 @@ export default class ClienteConfirmacao extends Component {
                     },
                     body: JSON.stringify(oDadosAppGeral)
                   })
-                  .then(objUtil.obterJsonResposta)
+                  .then(oUtil.obterJsonResposta)
                   .then((oJsonDados) => {
-                      objUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetorno);
+                      oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetorno);
                   })
         } catch (exc) {
             Alert.alert(exc);
@@ -68,25 +69,6 @@ export default class ClienteConfirmacao extends Component {
         if(oDados && oDados.id_cliente_iter) {
             Alert.alert("Cod. cliente Iter: " + oDados.id_cliente_iter);
         }
-    }
-
-    limpar() {
-        let oDadosAppGeral = this.state;
-
-        oDadosAppGeral.cliente.codigo = '';
-        oDadosAppGeral.cliente.nomeCliente = '';
-        oDadosAppGeral.cliente.nomeUsuario = '';
-        oDadosAppGeral.cliente.cpf = '';
-        oDadosAppGeral.cliente.rg = '';
-        oDadosAppGeral.cliente.email = '';
-        this.setState(oDadosAppGeral);
-    }
-
-    capturarDadosFiltroCallBack(oDadosFiltro) {
-        let oDadosAppGeral = this.state;
-        
-        oDadosAppGeral.cliente.codigo = oDadosFiltro.codigo;
-        this.setState(oDadosAppGeral);
     }
      
     voltar() {
@@ -104,17 +86,12 @@ export default class ClienteConfirmacao extends Component {
 
     render() {
         let dadosApp = this.state.dadosApp;
-        const { navigation } = this.props;
-
         let botoesTela = [ { element: this.botaoVoltar }, { element: this.botaoConfirmar } ];
 
-        // Obtem os dados vindos da tela dados pessoais.
-        objUtil.lerDadosNavegacao(dadosCliente, navigation);
-        
         return (
             <View style={styles.areaCliente}>
                 <Cabecalho titulo='Cadastro' nomeTela='Confirmação' />
-                <AreaDados parentCallBack={this.capturarDadosFiltroCallBack} dadosApp={dadosApp}/>
+                <AreaDados dadosApp={dadosApp}/>
                 <AreaBotoes botoes={botoesTela} />
             </View>
         );
@@ -128,24 +105,26 @@ export class AreaDados extends Component {
     }
 
     render() {
+        let oDadosApp = this.props.dadosApp;
+        let oDadosCliente = oDadosApp.cliente;
 
         return (
             <ScrollView>
                 <ThemeProvider theme={theme}>
                     <View style={styles.areaDadosCliente}>
-                        <Input label="Nome Completo" disabled={true} style={styles.Input} value={this.props.dadosCliente.nome} onChangeText={(valor) => { this.props.dadosCliente.nome = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>                
-                        <Input label="E-mail" disabled={true} style={styles.Input} value={this.props.dadosCliente.email} onChangeText={(valor) => { this.props.dadosCliente.email = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
-                        <Input label="CPF" disabled={true} style={styles.Input} value={this.props.dadosCliente.cpf} onChangeText={(valor) => { this.props.dadosCliente.cpf = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
-                        <Input label="RG" disabled={true} style={styles.Input} value={this.props.dadosCliente.rg} onChangeText={(valor) => { this.props.dadosCliente.rg = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>                
-                        <Input label="Telefone" disabled={true} style={styles.Input} value={this.props.dadosCliente.telefone} onChangeText={(valor) => { this.props.dadosCliente.telefone = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
-                        <Input label="Nome Usuário" disabled={true} style={styles.Input} value={this.props.dadosCliente.nomeUsuario} onChangeText={(valor) => { this.props.dadosCliente.nomeUsuario = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
-                        <Input label="Rua" disabled={true} style={styles.Input} value={this.props.dadosCliente.rua} onChangeText={(valor) => { this.props.dadosCliente.rua = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
-                        <Input label="Número" disabled={true} style={styles.Input} value={this.props.dadosCliente.numero} onChangeText={(valor) => { this.props.dadosCliente.numero = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
-                        <Input label="Complemento" disabled={true} style={styles.Input} value={this.props.dadosCliente.complemento} onChangeText={(valor) => { this.props.dadosCliente.complemento = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
-                        <Input label="Bairro" disabled={true} style={styles.Input} value={this.props.dadosCliente.bairro} onChangeText={(valor) => { this.props.dadosCliente.bairro = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>                
-                        <Input label="Cep" disabled={true} style={styles.Input} value={this.props.dadosCliente.cep} onChangeText={(valor) => { this.props.dadosCliente.cep = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
-                        <Input label="Cidade" disabled={true} style={styles.Input} value={this.props.dadosCliente.cidade} onChangeText={(valor) => { this.props.dadosCliente.cidade = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
-                        <Input label="Estado" disabled={true} style={styles.Input} value={this.props.dadosCliente.uf} onChangeText={(valor) => { this.props.dadosCliente.uf = valor; this.props.capturarDadosCallBack(this.props.dadosCliente)}}></Input>
+                        <Input label="Nome Completo" disabled={true} style={styles.Input} value={oDadosCliente.nome} onChangeText={(valor) => { oDadosCliente.nome = valor; this.setState(this.props)}}></Input>                
+                        <Input label="E-mail" disabled={true} style={styles.Input} value={oDadosCliente.email} onChangeText={(valor) => { oDadosCliente.email = valor; this.setState(this.props)}}></Input>
+                        <Input label="CPF" disabled={true} style={styles.Input} value={oDadosCliente.cpf} onChangeText={(valor) => { oDadosCliente.cpf = valor; this.setState(this.props)}}></Input>
+                        <Input label="RG" disabled={true} style={styles.Input} value={oDadosCliente.rg} onChangeText={(valor) => { oDadosCliente.rg = valor; this.setState(this.props)}}></Input>                
+                        <Input label="Telefone" disabled={true} style={styles.Input} value={oDadosCliente.telefone} onChangeText={(valor) => { oDadosCliente.telefone = valor; this.setState(this.props)}}></Input>
+                        <Input label="Nome Usuário" disabled={true} style={styles.Input} value={oDadosCliente.nomeUsuario} onChangeText={(valor) => { oDadosCliente.nomeUsuario = valor; this.setState(this.props)}}></Input>
+                        <Input label="Rua" disabled={true} style={styles.Input} value={oDadosCliente.rua} onChangeText={(valor) => { oDadosCliente.rua = valor; this.setState(this.props)}}></Input>
+                        <Input label="Número" disabled={true} style={styles.Input} value={oDadosCliente.numero} onChangeText={(valor) => { oDadosCliente.numero = valor; this.setState(this.props)}}></Input>
+                        <Input label="Complemento" disabled={true} style={styles.Input} value={oDadosCliente.complemento} onChangeText={(valor) => { oDadosCliente.complemento = valor; this.setState(this.props)}}></Input>
+                        <Input label="Bairro" disabled={true} style={styles.Input} value={oDadosCliente.bairro} onChangeText={(valor) => { oDadosCliente.bairro = valor; this.setState(this.props)}}></Input>                
+                        <Input label="Cep" disabled={true} style={styles.Input} value={oDadosCliente.cep} onChangeText={(valor) => { oDadosCliente.cep = valor; this.setState(this.props)}}></Input>
+                        <Input label="Cidade" disabled={true} style={styles.Input} value={oDadosCliente.cidade} onChangeText={(valor) => { oDadosCliente.cidade = valor; this.setState(this.props)}}></Input>
+                        <Input label="Estado" disabled={true} style={styles.Input} value={oDadosCliente.uf} onChangeText={(valor) => { oDadosCliente.uf = valor; this.setState(this.props)}}></Input>
                     </View>
                 </ThemeProvider>
             </ScrollView>       

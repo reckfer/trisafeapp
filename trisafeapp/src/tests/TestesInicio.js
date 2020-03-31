@@ -17,6 +17,7 @@ import Cabecalho from '../common/CabecalhoTela';
 import AreaBotoes from '../common/AreaBotoes';
 import { styles, theme } from '../common/Estilos';
 import UtilTests from '../tests/UtilTests';
+import GerenciadorDadosApp from '../common/GerenciadorDadosApp';
 
 export default class TestesInicio extends Component {
     static navigationOptions = {
@@ -24,7 +25,7 @@ export default class TestesInicio extends Component {
     }
     constructor(props) {
         super(props);
-                        
+        let oNavigation = this.props.navigation;
         this.irParaTesteCadastroIter = this.irParaTesteCadastroIter.bind(this);
         this.irParaTesteBoletoGerenciaNet = this.irParaTesteBoletoGerenciaNet.bind(this);        
         this.irParaTesteContratoPDF = this.irParaTesteContratoPDF.bind(this);
@@ -34,19 +35,19 @@ export default class TestesInicio extends Component {
         this.inicializarDadosTela = this.inicializarDadosTela.bind(this);
 
         objUtilTests = new UtilTests();
-        objUtil = new Util();
-
-        const { navigation } = this.props;
+        oUtil = new Util();
+        oGerenciadorDadosApp = new GerenciadorDadosApp(oNavigation);
         
-        this.inicializarDadosTela(navigation);
+        this.inicializarDadosTela();
     }
 
-    inicializarDadosTela(oNavigation) {
+    inicializarDadosTela() {
 
-        let oDados = objUtil.inicializarDados(oNavigation);
+        // let oDados = oGerenciadorDadosApp.inicializarDados(oNavigation);
+        let oDados = oGerenciadorDadosApp.getDadosAppGeral();
         this.state = oDados;
 
-        if(!objUtil.temDados(oDados)) {
+        if(!oUtil.temDados(oDados)) {
             this.obterUltimoCliente();
         }
     }
@@ -74,7 +75,7 @@ export default class TestesInicio extends Component {
 
     obterUltimoCliente() {
         try {
-            let url = objUtil.getURL('/clientes/obter_ultimo/');
+            let url = oUtil.getURL('/clientes/obter_ultimo/');
            
             fetch(url, {
                     method: 'POST',
@@ -84,9 +85,9 @@ export default class TestesInicio extends Component {
                     },
                     body: {}
                   })
-                  .then(objUtil.obterJsonResposta)
+                  .then(oUtil.obterJsonResposta)
                   .then((oJsonDados) => {
-                      objUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetorno);
+                      oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetorno);
                   })
         } catch (exc) {
             Alert.alert(exc);
@@ -97,21 +98,22 @@ export default class TestesInicio extends Component {
         let oDadosAppGeral = this.state;
 
         if(!oDados) {
-            oDados = this.gerarDadosTestes();
+            oDados = this.gerarDadosTestes();            
         }
+        oDadosAppGeral = oGerenciadorDadosApp.atribuirDados('cliente', oDados);
 
-        oDadosAppGeral.cliente.nome = oDados.nome;
-        oDadosAppGeral.cliente.cpf = oDados.cpf;
-        oDadosAppGeral.cliente.email = oDados.email;
-        oDadosAppGeral.cliente.nomeUsuario = oDados.usuario;
-        oDadosAppGeral.cliente.telefone = oDados.email;
-        oDadosAppGeral.cliente.rua = oDados.rua;
+        // oDadosAppGeral.cliente.nome = oDados.nome;
+        // oDadosAppGeral.cliente.cpf = oDados.cpf;
+        // oDadosAppGeral.cliente.email = oDados.email;
+        // oDadosAppGeral.cliente.nomeUsuario = oDados.usuario;
+        // oDadosAppGeral.cliente.telefone = oDados.email;
+        // oDadosAppGeral.cliente.rua = oDados.rua;
 
         this.setState(oDadosAppGeral);
     }
 
     gerarDadosTestes() {
-        let oDadosAppGeral = objUtil.inicializarDados();
+        let oDadosAppGeral = oGerenciadorDadosApp.inicializarDados();
         let oDadosApp = oDadosAppGeral.dadosApp;
         let oDadosCliente = oDadosApp.cliente;
         let oDadosContrato = oDadosApp.contrato;
