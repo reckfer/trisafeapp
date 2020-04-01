@@ -79,7 +79,7 @@ export default class BoletoEmissao extends Component {
 
     limpar() {
         let oDadosAppGeral = this.state;
-        let oDadosApp = oDadosAppGeral.dadosApp;
+        let oDadosApp = oDadosAppGeral.dados_app;
         let oCliente = oDadosApp.cliente;
 
         oCliente.codigo = '';

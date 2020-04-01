@@ -85,7 +85,7 @@ export default class ClienteConfirmacao extends Component {
     botaoConfirmar = () => <Button title="Confirmar" onPress={this.salvar} loading={this.state.processandoRequisicao} ></Button>;
 
     render() {
-        let dadosApp = this.state.dadosApp;
+        let dadosApp = this.state.dados_app;
         let botoesTela = [ { element: this.botaoVoltar }, { element: this.botaoConfirmar } ];
 
         return (

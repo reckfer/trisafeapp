@@ -75,7 +75,7 @@ export default class ClienteDadosPessoais extends Component {
     }
     
     render() {
-        let dadosApp = this.state.dadosApp;
+        let dadosApp = this.state.dados_app;
         // const { navigation } = this.props;        
         let botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>
         let botaoAvancar = () => <Button title="Avançar" onPress={this.confirmar} ></Button>

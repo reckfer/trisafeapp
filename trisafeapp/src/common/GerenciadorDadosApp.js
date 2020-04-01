@@ -57,7 +57,7 @@ const composicaoDadosCliente = [
 ]
 
 const composicaoDadosApp = { 
-    'dadosApp' : [
+    'dados_app' : [
         composicaoDadosCliente,
         fragmentoContrato,
     ]
@@ -88,15 +88,15 @@ export default class GerenciadorDadosApp {
             let oDadosApp;
 
             if(oDadosAppGeral.getParam) {
-                oDadosApp = oDadosAppGeral.getParam('dadosApp');
+                oDadosApp = oDadosAppGeral.getParam('dados_app');
             }
             if(oDadosApp) {
-                this.oDadosReferencia = { 'dadosApp': oDadosApp };
+                this.oDadosReferencia = { 'dados_app': oDadosApp };
             } else {
                 if(!this.oDadosReferencia){
                     this.oDadosReferencia = this.montarDadosApp(composicaoDadosApp);
                 }
-                if(oDadosAppGeral.dadosApp){
+                if(oDadosAppGeral.dados_app){
                     oDadosApp = oDadosAppGeral;
                 }
                 if(oDadosApp) {
@@ -232,7 +232,7 @@ export default class GerenciadorDadosApp {
     /*** FUNCOES DE ATRIBUICOES ****/
 
     atribuirDados(nomeAtributo, oDadosAtribuir) {
-        let oDados = this.oDadosReferencia.dadosApp;
+        let oDados = this.oDadosReferencia.dados_app;
         let oArrayDados;
         let oItemArray;
         let oDadosItemModelo;
@@ -303,8 +303,8 @@ export default class GerenciadorDadosApp {
 
     /*** FUNCOES AUXILIARES ****/
     temDados(oDadosAppGeral) {
-        if(oDadosAppGeral && oDadosAppGeral.dadosApp) {
-            let oDadosApp = oDadosAppGeral.dadosApp;
+        if(oDadosAppGeral && oDadosAppGeral.dados_app) {
+            let oDadosApp = oDadosAppGeral.dados_app;
             
             if(oDadosApp && oDadosApp.cliente) {
                 if(oDadosApp.cliente.cpf || oDadosApp.cliente.email) {

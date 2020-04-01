@@ -35,7 +35,6 @@ export default class ClienteInicio extends Component {
         //     date: new Date(Date.now() + 1000) // in 60 secs
         //   });
         let oNavigation = this.props.navigation;
-        this.capturarDadosCadastro = this.capturarDadosCadastro.bind(this);
         this.obterCliente = this.obterCliente.bind(this);
         this.irParaTestesRapidos = this.irParaTestesRapidos.bind(this);
         // this.solicitarPermissoes = this.solicitarPermissoes.bind(this);
@@ -71,15 +70,6 @@ export default class ClienteInicio extends Component {
     //         console.warn(err);
     //       }
     // }
-
-    capturarDadosCadastro(oDadosCadastro) {
-        let oDadosAppGeral = this.state;
-
-        oDadosAppGeral.cliente.cpf = oDadosCadastro.cpf;
-        oDadosAppGeral.cliente.email = oDadosCadastro.email;
-
-        this.setState(oDadosAppGeral);
-    }
 
     obterCliente() {
         try {
@@ -153,15 +143,8 @@ export default class ClienteInicio extends Component {
     botaoTestesRapidos = () => <Button title="Testes Rápidos" onPress={this.irParaTestesRapidos} ></Button>;
 
     render() {
-        let dadosApp = this.state.dadosApp;
+        let dadosApp = this.state.dados_app;
         let botoesTela = [ { element: this.botaoIniciar }, { element: this.botaoTestesRapidos} ];
-                
-        // const { navigation } = this.props;
-        
-        // if(!this.state.emCadastro) {
-        //     // Obtem os dados vindos da tela dados pessoais.
-        //     oUtil.lerDadosNavegacao(dadosCliente, navigation);
-        // }
 
         return (
             <View style={styles.areaCliente}>
@@ -179,19 +162,6 @@ export class AreaDados extends Component {
         super(props);
     }
 
-    // atualizarDados(oDadosCliente) {
-    //     let oDadosApp = this.props.dadosApp;
-
-    //     oGerenciadorDadosApp = new GerenciadorDadosApp(oDadosApp);
-
-    //     oDadosAppGeral = oGerenciadorDadosApp.atribuirDados('cliente', oDadosCliente);
-    //     // this.state = oGerenciadorDadosApp.inicializarDados(oNavigation);
-    //     // let oDadosNavegacao = this.props.dadosApp;
-    //     // oDadosNavegacao.cliente = oDadosCliente;
-        
-    //     this.setState(oDadosAppGeral);
-    // }
-
     render() {
         let oDadosApp = this.props.dadosApp;
         let oDadosCliente = oDadosApp.cliente;
@@ -208,15 +178,6 @@ export class AreaDados extends Component {
         );
     }
 }
-
-
-
-
-
-
-
-
-
 // gerarBoleto() {
 //     try {
 //         let oDadosAppGeral = this.state;            

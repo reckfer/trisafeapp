@@ -42,12 +42,11 @@ export default class TestesInicio extends Component {
     }
 
     inicializarDadosTela() {
-
-        // let oDados = oGerenciadorDadosApp.inicializarDados(oNavigation);
+        
         let oDados = oGerenciadorDadosApp.getDadosAppGeral();
         this.state = oDados;
 
-        if(!oUtil.temDados(oDados)) {
+        if(!oGerenciadorDadosApp.temDados(oDados)) {
             this.obterUltimoCliente();
         }
     }
@@ -102,19 +101,12 @@ export default class TestesInicio extends Component {
         }
         oDadosAppGeral = oGerenciadorDadosApp.atribuirDados('cliente', oDados);
 
-        // oDadosAppGeral.cliente.nome = oDados.nome;
-        // oDadosAppGeral.cliente.cpf = oDados.cpf;
-        // oDadosAppGeral.cliente.email = oDados.email;
-        // oDadosAppGeral.cliente.nomeUsuario = oDados.usuario;
-        // oDadosAppGeral.cliente.telefone = oDados.email;
-        // oDadosAppGeral.cliente.rua = oDados.rua;
-
         this.setState(oDadosAppGeral);
     }
 
     gerarDadosTestes() {
         let oDadosAppGeral = oGerenciadorDadosApp.inicializarDados();
-        let oDadosApp = oDadosAppGeral.dadosApp;
+        let oDadosApp = oDadosAppGeral.dados_app;
         let oDadosCliente = oDadosApp.cliente;
         let oDadosContrato = oDadosApp.contrato;
 
@@ -145,7 +137,7 @@ export default class TestesInicio extends Component {
     botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;
     
     render() {
-        let dadosApp = this.state.dadosApp;
+        let dadosApp = this.state.dados_app;
         let botoesTela = [ 
             { element: this.botaoVoltar }, 
         ];
@@ -179,7 +171,7 @@ export class AreaDados extends Component {
     }
 
     atualizarDados(oDadosCliente) {
-        let oDadosNavegacao = this.props.dadosApp;
+        let oDadosNavegacao = this.props.dados_app;
         oDadosNavegacao.cliente = oDadosCliente;
         
         this.setState(oDadosNavegacao);

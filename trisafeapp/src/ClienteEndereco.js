@@ -34,18 +34,6 @@ export default class ClienteEndereco extends Component {
 
         this.state = oGerenciadorDadosApp.getDadosAppGeral();
     }
-    limpar() {
-        let oDadosAppGeral = this.state;
-
-        oDadosAppGeral.cliente.cidade = '';
-        oDadosAppGeral.cliente.rua = '';
-        oDadosAppGeral.cliente.numero = '';
-        oDadosAppGeral.cliente.complemento = '';
-        oDadosAppGeral.cliente.bairro = '';
-        oDadosAppGeral.cliente.cep = '';
-        oDadosAppGeral.cliente.uf = '';
-        this.setState(oDadosAppGeral);
-    }
 
     confirmar() {
         const { navigation } = this.props;
@@ -63,7 +51,7 @@ export default class ClienteEndereco extends Component {
     }
 
     render() {
-        let dadosApp = this.state.dadosApp;
+        let dadosApp = this.state.dados_app;
         let botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>
         let botaoAvancar = () => <Button title="Avançar" onPress={this.confirmar} ></Button>
         

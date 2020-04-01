@@ -101,7 +101,7 @@ export default class ProdutoEscolha extends Component {
             //     'valorTotal': valorTotal,
             //     'listaProdutos': oDados,
             // }
-            oDadosAppGeral.dadosApp.contrato.valorTotal = valorTotal;
+            oDadosAppGeral.dados_app.contrato.valorTotal = valorTotal;
             
             this.setState(oDadosAppGeral);
         }
@@ -134,24 +134,25 @@ export default class ProdutoEscolha extends Component {
 
     tratarContratar(oDados) {
         const { navigation } = this.props;
-        var oDadosAppGeral = this.state;
+        var oDadosAppGeral = oGerenciadorDadosApp.getDadosAppGeral();
         
         if(oDados) {
-            oDadosAppGeral.processandoRequisicao = false;
-            let contrato = {
-                'valorTotal': oDadosAppGeral.contrato.valorTotal,
-                'listaProdutos': oDadosAppGeral.contrato.listaProdutos,
-                'boleto': {
-                    'url_boleto_pdf': oDados.url_boleto_pdf,
-                    'url_boleto_html': oDados.url_boleto_html,
-                }
-            }
-            oDadosAppGeral.contrato = contrato;
+            oGerenciadorDadosApp.atribuirDados('contrato', oDados);
+            // oDadosAppGeral.processandoRequisicao = false;
+            // let contrato = {
+            //     'valorTotal': oDadosAppGeral.contrato.valorTotal,
+            //     'listaProdutos': oDadosAppGeral.contrato.listaProdutos,
+            //     'boleto': {
+            //         'url_boleto_pdf': oDados.url_boleto_pdf,
+            //         'url_boleto_html': oDados.url_boleto_html,
+            //     }
+            // }
+            // oDadosAppGeral.contrato = contrato;
         }
         oDadosAppGeral.emCadastro = false;
         
-        this.setState(oDadosAppGeral);
-        navigation.navigate('BoletoEmissao', this.state);
+        // this.setState(oDadosAppGeral);
+        navigation.navigate('BoletoEmissao', oDadosAppGeral);
     }
     
     voltar() {
@@ -167,7 +168,7 @@ export default class ProdutoEscolha extends Component {
     botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;        
     
     render() {
-        let dadosApp = this.state.dadosApp;
+        let dadosApp = this.state.dados_app;
         
         let botoesTela = [ { element: this.botaoVoltar }];
         
