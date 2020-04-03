@@ -34,6 +34,8 @@ export default class TestesInicio extends Component {
         this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
         this.inicializarDadosTela = this.inicializarDadosTela.bind(this);
 
+        this.tratarDadosRetornoTemp = this.tratarDadosRetornoTemp.bind(this);
+
         objUtilTests = new UtilTests();
         oUtil = new Util();
         oGerenciadorDadosApp = new GerenciadorDadosApp(oNavigation);
@@ -67,9 +69,10 @@ export default class TestesInicio extends Component {
     }
 
     irParaTesteContratoPDF() {
-        const { navigation } = this.props;
+        // const { navigation } = this.props;
         
-        navigation.navigate('ContratoEfetivacao');
+        // navigation.navigate('ContratoEfetivacao');
+        this.obterContrato();
     }
 
     obterUltimoCliente() {
@@ -100,6 +103,35 @@ export default class TestesInicio extends Component {
             oDados = this.gerarDadosTestes();            
         }
         oDadosAppGeral = oGerenciadorDadosApp.atribuirDados('cliente', oDados);
+
+        this.setState(oDadosAppGeral);
+    }
+
+    obterContrato() {
+        try {
+            let url = oUtil.getURL('/contratos/obter/');
+            let oDadosAppGeral = oGerenciadorDadosApp.getDadosAppGeral();
+            oDadosAppGeral.dados_app.contrato.id_contrato = '0089810000000445'
+
+            fetch(url, {
+                    method: 'POST',
+                    headers: {
+                      Accept: 'application/json',
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(oDadosAppGeral)
+                  })
+                  .then(oUtil.obterJsonResposta)
+                  .then((oJsonDados) => {
+                      oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetornoTemp);
+                  })
+        } catch (exc) {
+            Alert.alert(exc);
+        }
+    }
+    
+    tratarDadosRetornoTemp(oDados) {
+        oDadosAppGeral = oGerenciadorDadosApp.atribuirDados('contrato', oDados);
 
         this.setState(oDadosAppGeral);
     }

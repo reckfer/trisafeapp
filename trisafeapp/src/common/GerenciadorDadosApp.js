@@ -230,7 +230,6 @@ export default class GerenciadorDadosApp {
     }
 
     /*** FUNCOES DE ATRIBUICOES ****/
-
     atribuirDados(nomeAtributo, oDadosAtribuir) {
         let oDados = this.oDadosReferencia.dados_app;
         let oArrayDados;
@@ -239,48 +238,68 @@ export default class GerenciadorDadosApp {
         let oDadosItem;
         let oArrayAtribuir;                        
         let campoItem;
+        let campo;
         let atribuir;
+        let pilhaObjetosContinuar = [];
+        let oObjetoPreencher = oDados;
         
-        for (campo in oDados) {
+
+        if(nomeAtributo) {
+            oObjetoPreencher = oDados[nomeAtributo];
+        }
+        let oCampoPreencher;
+        let camposPreencher = Object.keys(oObjetoPreencher);
+
+        for (let i = 0; i < camposPreencher.length; i ++) {
             atribuir = true;
+            campo = camposPreencher[i];
+            oCampoPreencher = oObjetoPreencher[campo];
 
-            if(nomeAtributo) {
-                atribuir = false;
-                if(nomeAtributo === campo) {
-                    atribuir = true;
-                    //this.atribuirDadosObjeto(oDados[nomeAtributo], oDadosAtribuir);
-                    oDadosAtribuir[campo] = oDadosAtribuir;
-                }
-            }
-
-            if(atribuir) {
-                if(oDados[campo] instanceof Array) {
-                    if(oDados[campo].length > 0) {
-                        oArrayDados = oDados[campo];
-                        oItemArray = oArrayDados[0];
-                        oDadosItemModelo = {};
-                        oArrayAtribuir = oDadosAtribuir[campo];                        
-                        campoItem = Object.keys(oItemArray)[0];
-                        // // Copia o modelo do objeto.
-                        // for(campoNovo in oItemArray) {
-                        //     oDadosItemModelo[campoNovo] = '';
-                        // }
-                        oDadosItemModelo = this.clonarObjeto(oItemArray);
-                        oArrayDados.length = 0;
-                        for(let i = 0; i < oArrayAtribuir.length; i++) {
-                            oDadosItem = {};
-                            for(campoNovo in oDadosItemModelo) {
-                                oDadosItem[campoNovo] = '';
-                            }
-                            
-                            this.atribuirDadosObjeto(oDadosItem, oArrayAtribuir[i]);
-                            oArrayDados.push(oDadosItem);
+            if(oCampoPreencher instanceof Array) {
+                if(oCampoPreencher.length > 0) {
+                    oArrayDados = oDados[campo];
+                    oItemArray = oArrayDados[0];
+                    oDadosItemModelo = {};
+                    oArrayAtribuir = oDadosAtribuir[campo];                        
+                    campoItem = Object.keys(oItemArray)[0];                    
+                    oDadosItemModelo = this.clonarObjeto(oItemArray);
+                    oArrayDados.length = 0;
+                    for(let i = 0; i < oArrayAtribuir.length; i++) {
+                        oDadosItem = {};
+                        for(campoNovo in oDadosItemModelo) {
+                            oDadosItem[campoNovo] = '';
                         }
                         
+                        this.atribuirDadosObjeto(oDadosItem, oArrayAtribuir[i]);
+                        oArrayDados.push(oDadosItem);
                     }
-                } else {
-                    this.atribuirDadosObjeto(oDados[campo], oDadosAtribuir[campo]);
+                    
                 }
+            } else if(oCampoPreencher instanceof Object) {  
+                // Empilha os dados do objeto atual                  
+                pilhaObjetosContinuar.unshift({
+                        'objBase': oObjetoPreencher,
+                        'objAtribuir': oDadosAtribuir,
+                        'camposPreencher': camposPreencher,
+                        'indice' : i
+                });
+                oObjetoPreencher = oCampoPreencher;
+                camposPreencher = Object.keys(oObjetoPreencher);
+                nomeAtributo = campo;
+                i = 0;
+                oDadosAtribuir = oDadosAtribuir[campo];
+            } else {   
+                oObjetoPreencher[campo] = oDadosAtribuir[campo];
+            }
+            
+            if((i + 1) === camposPreencher.length &&
+                pilhaObjetosContinuar.length > 0) {
+
+                let objContinuar = pilhaObjetosContinuar.shift();
+                oObjetoPreencher = objContinuar.objBase;
+                camposPreencher = objContinuar.camposPreencher;
+                oDadosAtribuir = objContinuar.objAtribuir;
+                i = objContinuar.indice;
             }
         }
 
@@ -297,6 +316,14 @@ export default class GerenciadorDadosApp {
         for(campo in oDadosAtribuir) {
             if(nomeAtributo === campo) {
                 return oDadosAtribuir[nomeAtributo];
+            }
+        }
+    }
+
+    encontrarObjeto(nomeAtributo, oDadosApp) {
+        for(campo in oDadosApp) {
+            if(nomeAtributo === campo) {
+                return oDadosApp[campo];
             }
         }
     }
