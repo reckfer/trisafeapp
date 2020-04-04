@@ -34,17 +34,20 @@ export default class ClienteInicio extends Component {
         //     message: "My Notification Message", // (required)
         //     date: new Date(Date.now() + 1000) // in 60 secs
         //   });
-        let oNavigation = this.props.navigation;
+        
         this.obterCliente = this.obterCliente.bind(this);
         this.irParaTestesRapidos = this.irParaTestesRapidos.bind(this);
         // this.solicitarPermissoes = this.solicitarPermissoes.bind(this);
         this.tratarDadosCliente = this.tratarDadosCliente.bind(this);
 
+        oNavigation = this.props.navigation;
         oUtil = new Util();
         oGerenciadorDadosApp = new GerenciadorDadosApp(oNavigation);
+        oDadosApp = oGerenciadorDadosApp.getDadosApp();
+        oDadosControleApp = oGerenciadorDadosApp.getDadosControleApp();
 
         this.state = oGerenciadorDadosApp.getDadosAppGeral();
-
+        
        // this.solicitarPermissoes();
     }
     
@@ -73,11 +76,10 @@ export default class ClienteInicio extends Component {
 
     obterCliente() {
         try {
-            let oDadosAppGeral = this.state;            
             let url = oUtil.getURL('/clientes/obter/');
 
-            oDadosAppGeral.processandoRequisicao = true;
-            this.setState(oDadosAppGeral);
+            oDadosControleApp.processando_requisicao = true;
+            oGerenciadorDadosApp.atualizarEstadoTela(this);
 
             fetch(url, {
                 method: 'POST',
@@ -85,7 +87,7 @@ export default class ClienteInicio extends Component {
                   Accept: 'application/json',
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(oDadosAppGeral),
+                body: JSON.stringify(this.state),
               })
                 .then(oUtil.obterJsonResposta)
                 .then((oJsonDados) => {
@@ -102,7 +104,7 @@ export default class ClienteInicio extends Component {
     }
 
     tratarDadosCliente(oDados, oEstado) {
-        const { navigation } = this.props;
+        
         let oDadosAppGeral = this.state;
 
         if(oEstado.cod_mensagem === 'NaoCadastrado') {
@@ -111,14 +113,14 @@ export default class ClienteInicio extends Component {
             Alert.alert(oEstado.mensagem);
         }
         if(oDados) {
-            // oDadosAppGeral.cliente = oDados;
+            
             oDadosAppGeral = oGerenciadorDadosApp.atribuirDados('cliente', oDados);
         }
 
-        oDadosAppGeral.processandoRequisicao = false;
-        oDadosAppGeral.emCadastro = true;
+        oDadosControleApp.processando_requisicao = false;
+        oGerenciadorDadosApp.atualizarEstadoTela(this);
 
-        navigation.navigate('ClienteDadosPessoais', oDadosAppGeral);
+        oNavigation.navigate('ClienteDadosPessoais', oDadosAppGeral);
     }
 
     tratarDadosBoleto(oDados, oEstado) {
@@ -126,20 +128,19 @@ export default class ClienteInicio extends Component {
             Alert.alert(oEstado.mensagem);
         }
         if(oDados && oDados.url_pdf) {
-            // Alert.alert(oDados.id);
+            
             this.baixarPDFBoleto(oDados.url_pdf);
         } else {
             Alert.alert('Sem dados boleto.');
         }
     }
 
-    irParaTestesRapidos(){
-        const { navigation } = this.props;
-        
-        navigation.navigate('TestesInicio', this.state);
+    irParaTestesRapidos() {
+
+        oNavigation.navigate('TestesInicio', this.state);
     }
 
-    botaoIniciar = () => <Button title="Iniciar" onPress={this.obterCliente} loading={this.state.processandoRequisicao}></Button>;
+    botaoIniciar = () => <Button title="Iniciar" onPress={this.obterCliente} loading={oDadosControleApp.processando_requisicao}></Button>;
     botaoTestesRapidos = () => <Button title="Testes Rápidos" onPress={this.irParaTestesRapidos} ></Button>;
 
     render() {
@@ -183,7 +184,7 @@ export class AreaDados extends Component {
 //         let oDadosAppGeral = this.state;            
 //         let url = oUtil.getURL('/boletos/gerarBoleto/');
 
-//         oDadosAppGeral.processandoRequisicao = true;
+//         oDadosAppGeral.processando_requisicao = true;
 //         this.setState(oDadosAppGeral);
 
 //         fetch(url, {

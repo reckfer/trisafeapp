@@ -112,7 +112,7 @@ export default class ProdutoEscolha extends Component {
             let url = oUtil.getURL('/contratos/efetivar/');
             let oDadosAppGeral = this.state;
             
-            oDadosAppGeral.processandoRequisicao = true;
+            oDadosAppGeral.controle_app.processando_requisicao = true;
             this.setState(oDadosAppGeral);
 
             fetch(url, {
@@ -138,20 +138,7 @@ export default class ProdutoEscolha extends Component {
         
         if(oDados) {
             oGerenciadorDadosApp.atribuirDados('contrato', oDados);
-            // oDadosAppGeral.processandoRequisicao = false;
-            // let contrato = {
-            //     'valorTotal': oDadosAppGeral.contrato.valorTotal,
-            //     'listaProdutos': oDadosAppGeral.contrato.listaProdutos,
-            //     'boleto': {
-            //         'url_boleto_pdf': oDados.url_boleto_pdf,
-            //         'url_boleto_html': oDados.url_boleto_html,
-            //     }
-            // }
-            // oDadosAppGeral.contrato = contrato;
         }
-        oDadosAppGeral.emCadastro = false;
-        
-        // this.setState(oDadosAppGeral);
         navigation.navigate('BoletoEmissao', oDadosAppGeral);
     }
     

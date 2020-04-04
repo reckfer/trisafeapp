@@ -25,7 +25,7 @@ export default class TestesInicio extends Component {
     }
     constructor(props) {
         super(props);
-        let oNavigation = this.props.navigation;
+        
         this.irParaTesteCadastroIter = this.irParaTesteCadastroIter.bind(this);
         this.irParaTesteBoletoGerenciaNet = this.irParaTesteBoletoGerenciaNet.bind(this);        
         this.irParaTesteContratoPDF = this.irParaTesteContratoPDF.bind(this);
@@ -33,45 +33,42 @@ export default class TestesInicio extends Component {
         this.obterUltimoCliente = this.obterUltimoCliente.bind(this);
         this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
         this.inicializarDadosTela = this.inicializarDadosTela.bind(this);
-
         this.tratarDadosRetornoTemp = this.tratarDadosRetornoTemp.bind(this);
 
         objUtilTests = new UtilTests();
+        oNavigation = this.props.navigation;        
         oUtil = new Util();
         oGerenciadorDadosApp = new GerenciadorDadosApp(oNavigation);
+        oDadosApp = oGerenciadorDadosApp.getDadosApp();
+        oDadosControleApp = oGerenciadorDadosApp.getDadosControleApp();
+        
+        this.state = oGerenciadorDadosApp.getDadosAppGeral();
         
         this.inicializarDadosTela();
     }
 
     inicializarDadosTela() {
-        
-        let oDados = oGerenciadorDadosApp.getDadosAppGeral();
-        this.state = oDados;
 
-        if(!oGerenciadorDadosApp.temDados(oDados)) {
+        if(!oGerenciadorDadosApp.temDados()) {
             this.obterUltimoCliente();
         }
     }
 
     irParaTesteCadastroIter() {
-        const { navigation } = this.props;
         
         let oDados = this.gerarDadosTestes();
 
-        navigation.navigate('ClienteInicio', oDados);
+        oNavigation.navigate('ClienteInicio', oDados);
     }
 
     irParaTesteBoletoGerenciaNet() {
-        const { navigation } = this.props;
-        // this.gerarDadosTestes();
-
-        navigation.navigate('ProdutoEscolha', this.state);
+        
+        oNavigation.navigate('ProdutoEscolha', this.state);
     }
 
     irParaTesteContratoPDF() {
-        // const { navigation } = this.props;
         
-        // navigation.navigate('ContratoEfetivacao');
+        // oNavigation.navigate('ContratoEfetivacao');
         this.obterContrato();
     }
 
@@ -97,21 +94,15 @@ export default class TestesInicio extends Component {
     }
 
     tratarDadosRetorno(oDados) {
-        let oDadosAppGeral = this.state;
 
-        if(!oDados) {
-            oDados = this.gerarDadosTestes();            
-        }
-        oDadosAppGeral = oGerenciadorDadosApp.atribuirDados('cliente', oDados);
-
-        this.setState(oDadosAppGeral);
+        oGerenciadorDadosApp.atribuirDados('cliente', oDados);
+        oGerenciadorDadosApp.atualizarEstadoTela(this);
     }
 
     obterContrato() {
         try {
             let url = oUtil.getURL('/contratos/obter/');
-            let oDadosAppGeral = oGerenciadorDadosApp.getDadosAppGeral();
-            oDadosAppGeral.dados_app.contrato.id_contrato = '0089810000000445'
+            oDadosApp.contrato.id_contrato = '0089810000000445'
 
             fetch(url, {
                     method: 'POST',
@@ -119,7 +110,7 @@ export default class TestesInicio extends Component {
                       Accept: 'application/json',
                       'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(oDadosAppGeral)
+                    body: JSON.stringify(this.state)
                   })
                   .then(oUtil.obterJsonResposta)
                   .then((oJsonDados) => {
@@ -131,16 +122,14 @@ export default class TestesInicio extends Component {
     }
     
     tratarDadosRetornoTemp(oDados) {
-        oDadosAppGeral = oGerenciadorDadosApp.atribuirDados('contrato', oDados);
 
-        this.setState(oDadosAppGeral);
+        oGerenciadorDadosApp.atribuirDados('contrato', oDados);
+        oGerenciadorDadosApp.atualizarEstadoTela(this);
     }
 
     gerarDadosTestes() {
         let oDadosAppGeral = oGerenciadorDadosApp.inicializarDados();
-        let oDadosApp = oDadosAppGeral.dados_app;
         let oDadosCliente = oDadosApp.cliente;
-        let oDadosContrato = oDadosApp.contrato;
 
         let numAleatorio = Math.random();
         let usuario = numAleatorio.toString(36).slice(6);
@@ -148,7 +137,7 @@ export default class TestesInicio extends Component {
         oDadosCliente.nome = 'Fernando Reck ' + usuario;
         oDadosCliente.cpf = objUtilTests.gerarCPF();
         oDadosCliente.email = usuario + '@emailtestes.com.br';
-        oDadosCliente.nomeUsuario = usuario;
+        oDadosCliente.nome_usuario = usuario;
         oDadosCliente.telefone = '51' + numAleatorio.toString().slice(9);
         oDadosCliente.rua = 'Rua do Relógio';
         oDadosCliente.numero = numAleatorio.toString().slice(15);
@@ -157,11 +146,6 @@ export default class TestesInicio extends Component {
         oDadosCliente.complemento = 'Ap. 4' + numAleatorio.toString(16);
         oDadosCliente.bairro = 'Bela Vista';
         oDadosCliente.cep = numAleatorio.toString().slice(10);
-        oDadosContrato.valorTotal = Math.floor(Math.random() * 100) + 1;
-        oDadosContrato.listaProdutos = [1, 2, 3];
-        oDadosContrato.boleto.url_boleto_pdf = '';
-        oDadosContrato.boleto.url_boleto_html = '';
-        oDadosApp.emTestes = true;
 
         return oDadosAppGeral;
     }
@@ -188,13 +172,6 @@ export default class TestesInicio extends Component {
         );
     }
 }
-
-// TestesInicio.navigationOptions = ({navigation, route}) => {
-//     return {
-//         headerTitle: '',        
-//         headerRight: () => {},
-//     }
-// };
 
 export class AreaDados extends Component {
 

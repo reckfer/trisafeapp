@@ -24,14 +24,15 @@ export default class ClienteDadosPessoais extends Component {
     }
     constructor(props) {
         super(props);
-        let oNavigation = this.props.navigation;
-        this.limpar = this.limpar.bind(this);
-        this.voltar = this.voltar.bind(this);
-        this.confirmar = this.confirmar.bind(this);
-        // this.capturarDadosCadastro = this.capturarDadosCadastro.bind(this);
         
+        this.voltar = this.voltar.bind(this);
+        this.avancar = this.avancar.bind(this);
+        
+        oNavigation = this.props.navigation;
         oUtil = new Util();
         oGerenciadorDadosApp = new GerenciadorDadosApp(oNavigation);
+        oDadosApp = oGerenciadorDadosApp.getDadosApp();
+        oDadosControleApp = oGerenciadorDadosApp.getDadosControleApp();
 
         this.state = oGerenciadorDadosApp.getDadosAppGeral();
     }
@@ -46,39 +47,24 @@ export default class ClienteDadosPessoais extends Component {
         return oJsonResposta;
     }
 
-    limpar() {
-        let oDadosAppGeral = this.state;
-
-        oDadosAppGeral.cliente.codigo = '';
-        oDadosAppGeral.cliente.nomeCliente = '';
-        oDadosAppGeral.cliente.nomeUsuario = '';
-        oDadosAppGeral.cliente.cpf = '';
-        oDadosAppGeral.cliente.rg = '';
-        oDadosAppGeral.cliente.email = '';
-        oDadosAppGeral.cliente.telefone = '';
-        this.setState(oDadosAppGeral);
-    }
-
-    confirmar() {
-        const { navigation } = this.props;
+    avancar() {
         
         // if(this.validarDadosPessoais()) {
-            this.state.emCadastro = false;
-            navigation.navigate('ClienteEndereco', this.state);
+            // this.state.dados_app.emCadastro = false;
+            oNavigation.navigate('ClienteEndereco', this.state);
         // }
     }
 
     voltar() {
-        const { navigation } = this.props;
         
-        navigation.navigate('ClienteInicio', this.state);
+        oNavigation.navigate('ClienteInicio', this.state);
     }
     
     render() {
         let dadosApp = this.state.dados_app;
         // const { navigation } = this.props;        
         let botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>
-        let botaoAvancar = () => <Button title="Avançar" onPress={this.confirmar} ></Button>
+        let botaoAvancar = () => <Button title="Avançar" onPress={this.avancar} ></Button>
         
         let botoesTela = [ { element: botaoVoltar }, { element: botaoAvancar } ];
 
@@ -114,9 +100,8 @@ export class AreaDados extends Component {
                         <Input placeholder="Informe seu Nome Completo" label="Nome Completo" value={oDadosCliente.nome} onChangeText={(valor) => { oDadosCliente.nome = valor; this.setState(this.props);}}></Input>
                         <Input placeholder="Informe seu E-Mail" label="E-mail" value={oDadosCliente.email} onChangeText={(valor) => {oDadosCliente.email = valor; this.setState(this.props);}}></Input>
                         <Input placeholder="Informe seu CPF" label="CPF" value={oDadosCliente.cpf} onChangeText={(valor) => { oDadosCliente.cpf = valor; this.setState(this.props);}}></Input>
-                        <Input placeholder="Informe seu RG" label="RG" value={oDadosCliente.rg} onChangeText={(valor) => { oDadosCliente.rg = valor; this.setState(this.props);}}></Input>                
                         <Input placeholder="Informe seu Telefone" label="Telefone" value={oDadosCliente.telefone} onChangeText={(valor) => { oDadosCliente.telefone = valor; this.setState(this.props);}}></Input>
-                        <Input placeholder="Informe seu Nome de Usuário" label="Nome de Usuário" value={oDadosCliente.nomeUsuario} onChangeText={(valor) => { oDadosCliente.nomeUsuario = valor; this.setState(this.props);}}></Input>
+                        <Input placeholder="Informe seu Nome de Usuário" label="Nome de Usuário" value={oDadosCliente.nome_usuario} onChangeText={(valor) => { oDadosCliente.nome_usuario = valor; this.setState(this.props);}}></Input>
                     </View>
                 </ThemeProvider>
             </ScrollView>

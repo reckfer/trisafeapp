@@ -41,7 +41,7 @@ export default class BoletoEmissao extends Component {
             let url = oUtil.getURL('/produtos/contratar/');
             let oDadosAppGeral = this.state;
             
-            oDadosAppGeral.processandoRequisicao = true;
+            oDadosAppGeral.controle_app.processando_requisicao = true;
             this.setState(oDadosAppGeral);
 
             fetch(url, {
@@ -64,16 +64,12 @@ export default class BoletoEmissao extends Component {
     tratarDadosRetorno(oDados) {
         let oDadosAppGeral = this.state;
 
-        oDadosAppGeral.processandoRequisicao = false;
-        this.setState(oDadosAppGeral);
-
         if(oDados && oDados.id_cliente_iter) {
             Alert.alert("Cod. cliente Iter: " + oDados.id_cliente_iter);
         }
 
         const { navigation } = this.props;
         
-        this.state.emCadastro = false;
         navigation.navigate('ClienteEndereco', this.state);
     }
 

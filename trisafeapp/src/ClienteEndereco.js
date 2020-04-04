@@ -24,43 +24,42 @@ export default class ClienteEndereco extends Component {
     }
     constructor(props) {
         super(props);
-        let oNavigation = this.props.navigation;
-        this.limpar = this.limpar.bind(this);
-        this.confirmar = this.confirmar.bind(this);
+        
+        this.avancar = this.avancar.bind(this);
         this.voltar = this.voltar.bind(this);
         
+        oNavigation = this.props.navigation;
         oUtil = new Util();
         oGerenciadorDadosApp = new GerenciadorDadosApp(oNavigation);
+        oDadosApp = oGerenciadorDadosApp.getDadosApp();
+        oDadosControleApp = oGerenciadorDadosApp.getDadosControleApp();
 
         this.state = oGerenciadorDadosApp.getDadosAppGeral();
     }
 
-    confirmar() {
-        const { navigation } = this.props;
+    avancar() {
+        // const { navigation } = this.props;
         
         // if(this.validarDadosPessoais()) {
-            this.state.emCadastro = false;
-            navigation.navigate('ClienteConfirmacao', this.state);
+            oNavigation.navigate('ClienteConfirmacao', this.state);
         // }
     }
 
     voltar() {
-        const { navigation } = this.props;
         
-        navigation.navigate('ClienteDadosPessoais', this.state);
+        oNavigation.navigate('ClienteDadosPessoais', this.state);
     }
 
     render() {
-        let dadosApp = this.state.dados_app;
         let botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>
-        let botaoAvancar = () => <Button title="Avançar" onPress={this.confirmar} ></Button>
+        let botaoAvancar = () => <Button title="Avançar" onPress={this.avancar} ></Button>
         
         let botoesTela = [ { element: botaoVoltar }, { element: botaoAvancar } ];
 
         return (
             <View style={styles.areaCliente}>
                 <Cabecalho titulo='Cadastro' nomeTela='Endereço' />
-                <AreaDados dadosApp={dadosApp}/>
+                <AreaDados dadosApp={oDadosApp}/>
                 <AreaBotoes botoes={botoesTela} />
             </View>
         );

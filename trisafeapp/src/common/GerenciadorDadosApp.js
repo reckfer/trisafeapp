@@ -8,9 +8,8 @@ const fragmentoClienteDadosPessoais = {
     'cliente': {
         'nome': '', 
         'cpf': '', 
-        'rg': '', 
         'email': '', 
-        'nomeUsuario': '',
+        'nome_usuario': '',
         'telefone': '',
     }
 }
@@ -50,6 +49,12 @@ const fragmentoContrato = {
     }
 }
 
+const fragmentoControleApp = { 
+    'controle_app': {
+        'processando_requisicao': false,
+    }
+}
+
 const composicaoDadosCliente = [
     fragmentoClienteInicio,
     fragmentoClienteDadosPessoais,
@@ -60,6 +65,7 @@ const composicaoDadosApp = {
     'dados_app' : [
         composicaoDadosCliente,
         fragmentoContrato,
+        fragmentoControleApp,
     ]
 }
 
@@ -70,6 +76,20 @@ export default class GerenciadorDadosApp {
         if(oDadosAppGeral){
             this.inicializarDados(oDadosAppGeral);
         }
+    }
+
+    getDadosApp() {
+        if(this.oDadosReferencia) {
+            return this.oDadosReferencia.dados_app;
+        }
+        return null;
+    }
+
+    getDadosControleApp() {
+        if(this.oDadosReferencia) {
+            return this.oDadosReferencia.dados_app.controle_app;
+        }
+        return null;
     }
 
     getDadosAppGeral() {
@@ -230,6 +250,13 @@ export default class GerenciadorDadosApp {
     }
 
     /*** FUNCOES DE ATRIBUICOES ****/
+    atualizarEstadoTela(objetoTela) {
+        if(this.oDadosReferencia) {
+            objetoTela.setState(this.oDadosReferencia);
+        }
+    }
+
+
     atribuirDados(nomeAtributo, oDadosAtribuir) {
         let oDados = this.oDadosReferencia.dados_app;
         let oArrayDados;
@@ -329,13 +356,46 @@ export default class GerenciadorDadosApp {
     }
 
     /*** FUNCOES AUXILIARES ****/
-    temDados(oDadosAppGeral) {
-        if(oDadosAppGeral && oDadosAppGeral.dados_app) {
-            let oDadosApp = oDadosAppGeral.dados_app;
+    temDados() {
+        if(this.oDadosReferencia && this.oDadosReferencia.dados_app) {
+            let oDadosApp = this.oDadosReferencia.dados_app;
+            let campos = Object.keys(oDadosApp);
+            let campo;
+            let oCampo;
+            let oPilhaPendencias = [];
+
+            for(let i = 0; i < campos.length; i++) {
+                campo = campos[i];
+                oCampo = oDadosApp[campo];
             
-            if(oDadosApp && oDadosApp.cliente) {
-                if(oDadosApp.cliente.cpf || oDadosApp.cliente.email) {
-                    return true;
+                if(oCampo) {
+                    if(oCampo instanceof Object) {
+                        let oDadosAux = oCampo;
+
+                        oPilhaPendencias.unshift({
+                            'objPendente' : oDadosApp,
+                            'camposPendentes' : campos,
+                            'indice': i
+                        });
+                        if (oCampo instanceof Array && oCampo.length > 0) {
+                            oDadosAux = oCampo[0];
+                        }
+                        oDadosApp = oDadosAux;
+                        campos = Object.keys(oDadosAux);
+                        i = 0;
+                    } else if (typeof(oCampo) === 'string' && oCampo.trim()) {
+                        return true;
+                    } else if (typeof(oCampo) === 'number' && oCampo > 0) {
+                        return true;
+                    }
+                }
+
+                if((i + 1) === campos.length && oPilhaPendencias.length > 0) {
+
+                    let objContinuar = oPilhaPendencias.shift();
+                    oDadosApp = objContinuar.objPendente;
+                    campos = objContinuar.camposPendentes;
+                    i = objContinuar.indice;
                 }
             }
         }
