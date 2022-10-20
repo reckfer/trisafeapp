@@ -14,7 +14,7 @@
     "react-native-elements": "^1.2.7",
     "react-native-gesture-handler": "^1.5.6",
     "react-native-push-notification": "^3.1.9",
-    "react-native-reanimated": "^1.7.0",
+    "react-native-reanimated": "^2.10.0",
     "react-native-screens": "^2.0.0-alpha.34",
     "react-native-vector-icons": "^6.6.0",
     "react-native-webview": "^8.0.6",
